@@ -9,6 +9,8 @@ public class FifteenProblem {
             new ArrayList<>(Arrays.asList('1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', ' '));
     final static ArrayList<String> SEARCHES =
             new ArrayList<>(Arrays.asList("BFS", "DFS", "GBFS", "AStar", "DLS", "ID"));
+
+
     public static void main (String[] args) {
         /*For testing manual input because I'm lazy*/
         args = new String[2];
