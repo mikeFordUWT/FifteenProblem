@@ -29,6 +29,11 @@ public class Board {
         blankPosition = getBlank(myBoard);
         System.out.println("Current Blank Location: ROW: " + blankPosition.get('i')
                 + " COLUMN: " + blankPosition.get('j'));
+
+        char[][] newBoard = moveLeft(myBoard);
+        PuzzleNode newNode = new PuzzleNode(newBoard);
+        System.out.println(newNode.checkState());
+
     }
 
 
@@ -37,13 +42,22 @@ public class Board {
     }
 
     //TODO
+    /**
+     *
+     * @return
+     */
     public String BFS(){
         StringBuilder toReturn = new StringBuilder();
+
 
         return toReturn.toString();
     }
 
     //TODO
+    /**
+     *
+     * @return
+     */
     public String DFS(){
         StringBuilder toReturn = new StringBuilder();
 
@@ -51,6 +65,10 @@ public class Board {
     }
 
     //TODO
+    /**
+     *
+     * @return
+     */
     public String GBFS(){
         StringBuilder toReturn = new StringBuilder();
 
@@ -83,4 +101,54 @@ public class Board {
 
         return cooridinates;
     }
+
+    private char[][] moveUp(char[][] boardState){
+        char[][] toReturn = boardState;
+        Map<Character, Integer> blankSpot = getBlank(toReturn);
+        int i = blankSpot.get('i');
+        int j = blankSpot.get('j');
+        char blank = toReturn[i][j];
+        char swap = toReturn[i-1][j];
+        toReturn[i-1][j] = blank;
+        toReturn[i][j] = swap;
+        return toReturn;
+    }
+
+    private char[][] moveDown(char[][] boardState){
+        char[][] toReturn = boardState;
+        Map<Character, Integer> blankSpot = getBlank(toReturn);
+        int i = blankSpot.get('i');
+        int j = blankSpot.get('j');
+        char blank = toReturn[i][j];
+        char swap = toReturn[i+1][j];
+        toReturn[i+1][j] = blank;
+        toReturn[i][j] = swap;
+
+        return toReturn;
+    }
+
+    private char[][] moveRight(char[][] boardState){
+        char[][] toReturn = boardState;
+        Map<Character, Integer> blankSpot = getBlank(toReturn);
+        int i = blankSpot.get('i');
+        int j = blankSpot.get('j');
+        char blank = toReturn[i][j];
+        char swap = toReturn[i][j+1];
+        toReturn[i][j] = swap;
+        toReturn[i][j+1] = blank;
+        return toReturn;
+    }
+
+    private char[][] moveLeft(char[][] boardState){
+        char[][] toReturn = boardState;
+        Map<Character, Integer> blankSpot = getBlank(toReturn);
+        int i = blankSpot.get('i');
+        int j = blankSpot.get('j');
+        char blank = toReturn[i][j];
+        char swap = toReturn[i][j-1];
+        toReturn[i][j] = swap;
+        toReturn[i][j-1] = blank;
+        return toReturn;
+    }
+
 }

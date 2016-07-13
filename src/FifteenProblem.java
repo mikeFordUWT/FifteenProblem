@@ -14,7 +14,7 @@ public class FifteenProblem {
     public static void main (String[] args) {
         /*For testing manual input because I'm lazy*/
         args = new String[2];
-        args[0] = "ABCDEF43 2156789";
+        args[0] = "ABCDEF432 156789";
         args[1] = "BFS";
         Board myBoard;
 
