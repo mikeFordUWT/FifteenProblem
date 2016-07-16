@@ -9,7 +9,7 @@ public class PuzzleTree {
     private PuzzleNode myRootNode;
 
     public PuzzleTree(char[][] theRootNode){
-        myRootNode = new PuzzleNode(theRootNode);
+        myRootNode = new PuzzleNode(theRootNode, 0);
         myDepth = 0;
         myExpanded = 0;
         myCreatedNodes = 1;
@@ -24,15 +24,35 @@ public class PuzzleTree {
         return myDepth;
     }
 
+    public void setDepth(int theDepth) {
+        myDepth = theDepth;
+    }
+
+    public void incrementDepth(){
+        myDepth++;
+    }
+
     public int getMaxFringe() {
         return myMaxFringe;
+    }
+
+    public void incrementMaxFringe(){
+        myMaxFringe++;
     }
 
     public int getExpanded() {
         return myExpanded;
     }
 
+    public void incrementExpanded(){
+        myExpanded++;
+    }
+
     public int getCreated() {
         return myCreatedNodes;
+    }
+
+    public void incrementCreated(){
+        myCreatedNodes++;
     }
 }

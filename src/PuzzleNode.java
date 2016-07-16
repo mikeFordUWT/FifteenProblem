@@ -9,28 +9,38 @@ public class PuzzleNode {
             new ArrayList<>(Arrays.asList("123456789ABCDEF ", "123456789ABCDFE "));
 
     private char[][] myData;
-    private ArrayList<char[][]> myKids;
+    private ArrayList<PuzzleNode> myKids;
     private int myDepth;
     private int myMisplacedTiles;
     private int myTotalMovesToWin;
 
 
 
-    public PuzzleNode(char[][] theData){
+    public PuzzleNode(char[][] theData, int theDepth){
         myData = theData;
+        myDepth = theDepth;
         myKids = new ArrayList<>();
         myMisplacedTiles = 0;
         myTotalMovesToWin = 0;
     }
 
-    public void addChild(char[][] theNode){
+    public void addChild(PuzzleNode theNode){
         myKids.add(theNode);
 
     }
-    public ArrayList<char[][]> getMyKids() {
+
+    public int getDepth(){
+        return myDepth;
+    }
+
+
+    public ArrayList<PuzzleNode> getMyKids() {
         return myKids;
     }
 
+    public char[][] getData(){
+        return myData;
+    }
 
     public String checkState(){
         StringBuilder toBuild = new StringBuilder();

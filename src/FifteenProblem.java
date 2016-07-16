@@ -14,7 +14,8 @@ public class FifteenProblem {
     public static void main (String[] args) {
         /*For testing manual input because I'm lazy*/
         args = new String[2];
-        args[0] = "ABCDEF432 156789";
+        args[0] = "123456789ABC DEF";
+//        args[0] = "123456789ABCDEF ";
         args[1] = "BFS";
         Board myBoard;
 
@@ -43,7 +44,8 @@ public class FifteenProblem {
             myBoard = new Board(toUp);
 
             if(args[1].equals("BFS")){ //BREADTH FIRST
-
+                String result = myBoard.BFS();
+                System.out.println(result);
             } else if(args[1].equals("DFS")){ //DEPTH FIRST
 
             } else if(args[1].equals("DLS")){ //DEPTH LIMITED
