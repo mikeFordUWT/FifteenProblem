@@ -1,17 +1,24 @@
+
 import java.util.*;
-import java.util.stream.Collector;
 
 /**
  * Created by Mike on 7/6/16.
  */
 public class Board {
-
+    private final char BLANK = ' ';
     private final ArrayList<String> WIN_STATES =
             new ArrayList<>(Arrays.asList("123456789ABCDEF ", "123456789ABCDFE "));
     private char[][] myBoard;
     private PuzzleTree myTree;
+    private PuzzleNode myRoot;
     private Map<Character, Integer> blankPosition;
+    private int myHeuristic;
 
+    /**
+     * Constructor for when no heuristic is needed.
+     *
+     * @param startState String of the start state of the tree
+     */
     public Board(String startState){
         myBoard = new char[4][4];
         int k = 0;
@@ -21,306 +28,347 @@ public class Board {
                 k++;
             }
         }
-
-        myTree = new PuzzleTree(myBoard);
+        PuzzleNode root = new PuzzleNode(myBoard, 0);
+        myTree = new PuzzleTree(root);
         System.out.println(myTree.getRoot().checkState());
         blankPosition = getBlank(myBoard);
-//        System.out.println("Current Blank Location: ROW: " + blankPosition.get('i')
-//                + " COLUMN: " + blankPosition.get('j'));
-//
-//        char[][] newBoard = moveLeft(myBoard);
-//        PuzzleNode newNode = new PuzzleNode(newBoard);
-//        System.out.println(newNode.checkState());
+
 
     }
 
+    /**
+     * Board constructor for searches with a Heuristic
+     *
+     * @param startState 2D Array start state for puzzle
+     * @param theHeuristic the Heuristic to be uses: 1 for misplaced tiles, 2 for total moves until win
+     */
+    public Board(String startState, int theHeuristic){
+        myBoard = new char[4][4];
+        int k = 0;
+        for(int i=0; i< 4; i++){
+            for(int j = 0; j <4; j++){
+                myBoard[i][j] = startState.charAt(k);
+                k++;
+            }
+        }
+        myHeuristic = theHeuristic;
+        PuzzleNode root = new PuzzleNode(myBoard, 0, theHeuristic);
+        myTree = new PuzzleTree(root);
+        System.out.println(myTree.getRoot().checkState());
+        blankPosition = getBlank(myBoard);
+    }
 
+    /**
+     * Get the state of the board.
+     *
+     * @return 2D Array of the board state
+     */
     public char[][] getMyBoard() {
         return myBoard;
     }
 
-    //TODO
-    /**
-     *
-     * @return
-     */
+
     public String BFS(){
         Queue<PuzzleNode> fringe = new LinkedList<>();
+        LinkedList<PuzzleNode> created = new LinkedList<>(); //store the string
         ArrayList<PuzzleNode> visited = new ArrayList<>();
-        ArrayList<PuzzleNode> created = new ArrayList<>();
-        StringBuilder toReturn = new StringBuilder();
-        PuzzleTree temp = myTree;
-        PuzzleNode current = temp.getRoot();
+
+        PuzzleNode current = new PuzzleNode(myBoard, 0);
+        PuzzleTree tree = new PuzzleTree(current);
+        tree.incrementCreated();
         created.add(current);
-        int i = blankPosition.get('i');
-        int j = blankPosition.get('j');
+        fringe.offer(current);
+        int fringeSize = fringe.size();
         boolean win = false;
 
-        while(!win){
-            if(current.getDepth() > myTree.getDepth()){
-                myTree.setDepth(current.getDepth());
+        while(!win){//until a win state is found
+            int row;
+            int column;
+            if(!fringe.isEmpty()){
+                current = fringe.poll();
+                row = getRow(current.getData(), BLANK);
+                column = getColumn(current.getData(), BLANK);
+                visited.add(current);
+                tree.incrementExpanded();
+
+                if(current.getDepth() > tree.getDepth()){
+                    tree.setDepth(current.getDepth());
+                }
+            } else {
+                row=-1;
+                column=-1;
             }
-            if(!current.winState()){
-//                System.out.println(current.checkState());
-                char[][] tempData = makeCopy(current.getData());
-                myTree.incrementExpanded();
-                int lastIndex = current.getData().length -1;
-                int depth = current.getDepth() + 1;
 
-
-
-                if(j != lastIndex){
-                    PuzzleNode right = new PuzzleNode(moveRight(tempData), depth);
-//                    System.out.println("RIGHT:\n"+right.checkState());
-                    addToFringeBFS(fringe,visited,current,right);
-                }
-
-                if(i != lastIndex){
-                    tempData = makeCopy(current.getData());
-                    PuzzleNode down = new PuzzleNode(moveDown(tempData), depth);
-//                    System.out.println("DOWN:\n"+down.checkState());
-                    addToFringeBFS(fringe, visited, current, down);
-                }
-
-                if(j != 0){
-                    tempData = makeCopy(current.getData());
-                    PuzzleNode left = new PuzzleNode(moveLeft(tempData), depth);
-//                    System.out.println("LEFT:\n" + left.checkState());
-                    addToFringeBFS(fringe, visited, current, left);
-                }
-
-                if(i != 0){
-                    tempData = makeCopy(current.getData());
-                    PuzzleNode up = new PuzzleNode(moveUp(tempData), depth);
-//                    System.out.println("UP:\n"+up.checkState());
-                    addToFringeBFS(fringe, visited, current, up);
-                }
-
-//                myTree.incrementDepth();
-
-                if(!fringe.isEmpty()){
-                    current = fringe.poll();
-                    Map<Collector.Characteristics, Integer> iJ = getBlank(current.getData());
-                    i = iJ.get('i');
-                    j = iJ.get('j');
-                }else{
-                    System.out.println("SHIT!!!!!");
-                    break;
-                }
-                if(myTree.getDepth()>10000){
-                    break;
-                }
-
-
-//                if(i>0 && j>0 && i<lastIndex && j< lastIndex){
-//
-////                    char[][] tempData = makeCopy(current.getData());
-////                    PuzzleNode right = new PuzzleNode(moveRight(tempData));
-////                    System.out.println("RIGHT:\n"+right.checkState());
-////                    addToFringeBFS(fringe,visited,current,right);
-//
-////                    if(!created.contains(right)){
-////                        current.addChild(right);
-////                        created.add(right);
-////                        if(!visited.contains(right)){
-////                            fringe.add(right);
-////                        }
-////
-////                    }
-//
-//
-////                    tempData = makeCopy(current.getData());
-////                    PuzzleNode down = new PuzzleNode(moveDown(tempData));
-////                    System.out.println("DOWN:\n"+down.checkState());
-////                    addToFringeBFS(fringe, visited, current, down);
-//
-////                    if(!created.contains(down)){
-////                        current.addChild(down);
-////                        created.add(down);
-////                        if(!visited.contains(down)){
-////                            fringe.add(down);
-////                        }
-////
-////                    }
-//
-//
-////                    tempData = makeCopy(current.getData());
-////                    PuzzleNode left = new PuzzleNode(moveLeft(tempData));
-////                    System.out.println("LEFT:\n" + left.checkState());
-////                    addToFringeBFS(fringe, visited, current, left);
-////                    if(!created.contains(left)){
-////                        current.addChild(left);
-////                        created.add(left);
-////                        if(!visited.contains(left)){
-////                            fringe.add(left);
-////                        }
-////
-////                    }
-//
-//
-////                    tempData = makeCopy(current.getData());
-////                    PuzzleNode up = new PuzzleNode(moveUp(tempData));
-////                    System.out.println("UP:\n"+up.checkState());
-////
-////                    addToFringeBFS(fringe, visited, current, up);
-////                    if(!created.contains(up)){
-////                        current.addChild(up);
-////                        created.add(up);
-////                        if(!visited.contains(up)){
-////                            fringe.add(up);
-////                            visited.add(up);
-////                        }
-////
-////                    }
-//
-//
-////                    if(!fringe.isEmpty()){
-////                        current = fringe.poll();
-////                        Map<Collector.Characteristics, Integer> iJ = getBlank(current.getData());
-////                        i = iJ.get('i');
-////                        j = iJ.get('j');
-////                    }else{
-////                        System.out.println("SHIT!!!!!");
-////                    }
-//
-//                }
-//               if(i == lastIndex && j == lastIndex){
-////                    TODO bottom right corner
-//                    tempData = makeCopy(current.getData());
-//                    PuzzleNode left = new PuzzleNode(moveLeft(tempData));
-//                    System.out.println("LEFT:\n" + left.checkState());
-//                    addToFringeBFS(fringe, visited, current, left);
-////                    if(!created.contains(left)){
-////                        current.addChild(left);
-////                        created.add(left);
-////                        if(!visited.contains(left)){
-////                            fringe.add(left);
-////                            visited.add(left);
-////                        }
-////                    }
-//
-//
-//                    tempData = makeCopy(current.getData());
-//                    PuzzleNode up = new PuzzleNode(moveUp(tempData));
-//                    System.out.println("UP:\n"+up.checkState());
-//                    addToFringeBFS(fringe, visited, current, up);
-////                    current.addChild(up);
-//
-//                } else if(i == lastIndex && j == 0){//bottom left corner
-//                    tempData = makeCopy(current.getData());
-//                    PuzzleNode right = new PuzzleNode(moveRight(tempData));
-//                    System.out.println("RIGHT:\n"+right.checkState());
-//                    addToFringeBFS(fringe, visited, current, right);
-////                    current.addChild(right);
-//
-//                    tempData = makeCopy(current.getData());
-//                    PuzzleNode up = new PuzzleNode(moveUp(tempData));
-//                    System.out.println("UP:\n"+up.checkState());
-//                    addToFringeBFS(fringe, visited, current, up);
-////                    current.addChild(up);
-//
-//                } else if(i == 0 && j == lastIndex){
-////                    TODO top right corner
-//                    tempData = makeCopy(current.getData());
-//                    PuzzleNode down = new PuzzleNode(moveDown(tempData));
-//                    System.out.println("DOWN:\n"+down.checkState());
-//                    addToFringeBFS(fringe, visited, current, down);
-////                    current.addChild(down);
-//
-//                    tempData = makeCopy(current.getData());
-//                    PuzzleNode left = new PuzzleNode(moveLeft(tempData));
-//                    System.out.println("LEFT:\n" + left.checkState());
-//                    addToFringeBFS(fringe, visited, current, left);
-////                    current.addChild(left);
-//                } else if(i == 0 && j == 0){//TOP LEFT
-////                    todo top left
-//                    tempData = makeCopy(current.getData());
-//                    PuzzleNode right = new PuzzleNode(moveRight(tempData));
-//                    System.out.println("RIGHT:\n"+right.checkState());
-////                    current.addChild(right);
-//                    addToFringeBFS(fringe, visited, current, right);
-//
-//                    tempData = makeCopy(current.getData());
-//                    PuzzleNode down = new PuzzleNode(moveDown(tempData));
-//                    System.out.println("DOWN:\n"+down.checkState());
-//                    addToFringeBFS(fringe, visited, current, down);
-////                    current.addChild(down);
-//                }
-//                else if(i == lastIndex){
-////                    TODO
-//                    if(j == lastIndex){
-//                        //should never hit this block
-//                        System.out.println("HOW? i:"+ i + " j: "+ j);
-//                    } else if (j ==0) {
-//                        //should never hit
-//                        System.out.println("WHY? i:"+ i + " j: "+ j);
-//                    } else{
-//                        System.out.println("IIII:" + i);
-//
-//                        tempData = makeCopy(current.getData());
-//                        PuzzleNode right = new PuzzleNode(moveRight(tempData));
-//                        System.out.println("RIGHT:\n"+right.checkState());
-//                        addToFringeBFS(fringe, visited, current, right);
-////                        current.addChild(right);
-//
-//                        tempData = makeCopy(current.getData());
-//                        PuzzleNode left = new PuzzleNode(moveLeft(tempData));
-//                        System.out.println("LEFT:\n" + left.checkState());
-//                        addToFringeBFS(fringe, visited, current, left);
-////                        current.addChild(left);
-//
-//                        tempData = makeCopy(current.getData());
-//                        PuzzleNode up = new PuzzleNode(moveUp(tempData));
-//                        System.out.println("UP:\n"+up.checkState());
-//                        addToFringeBFS(fringe, visited, current, up);
-////                        current.addChild(up);
-//                        break;
-//
-//                    }
-//                } else if (j == 3){
-//                    tempData = makeCopy(current.getData());
-//                    PuzzleNode down = new PuzzleNode(moveDown(tempData));
-//                    addToFringeBFS(fringe, visited, current, down);
-//
-//                    tempData = makeCopy(current.getData());
-//                    PuzzleNode left = new PuzzleNode(moveLeft(tempData));
-//                    addToFringeBFS(fringe, visited, current, left);
-//
-//                    tempData = makeCopy(current.getData());
-//                    PuzzleNode up = new PuzzleNode(moveUp(tempData));
-//                    addToFringeBFS(fringe, visited, current, up);
-//
-//                } else if(i == 0){//BORDER CASE UPPER
-//                    tempData = makeCopy(current.getData());
-//
-//                } else if(j == 0){
-//
-//                }
-            }else{
+            if(current.winState()){
                 win = true;
+            }
+
+            if(row >=0 && column >=0){ // we have a valid row and column
+                ArrayList<PuzzleNode> neighbors = movesNoH(current, row, column);
+                for(int i = 0; i< neighbors.size(); i++){
+                    fringe.offer(neighbors.get(i)); //add each node to the fringe
+                    tree.incrementCreated();
+                }
+
+                if(fringe.size() > fringeSize){
+                    fringeSize = fringe.size();
+                }
             }
         }
 
-        System.out.println("\"" + current.toString() + "\"");
-        toReturn.append(myTree.getDepth() + " "+ myTree.getCreated() + " " + myTree.getExpanded() + " "+ myTree.getMaxFringe());
-        return myTree.getDepth() + " "+ myTree.getCreated() + " " + myTree.getExpanded() + " "+ myTree.getMaxFringe();
+        return tree.getDepth() + " "+ tree.getCreated() + " " + tree.getExpanded() + " "+ fringeSize;
+    }
+
+    /**
+     * Runs a Breadth First Search of the Tree.
+     *
+     * @return String with results
+     */
+    public String BFS1(){
+        Queue<PuzzleNode> fringe = new LinkedList<>();
+        LinkedList<PuzzleNode> created = new LinkedList<>(); //store the string
+        ArrayList<PuzzleNode> visited = new ArrayList<>();
+
+        PuzzleNode current = new PuzzleNode(myBoard, 0);
+        PuzzleTree tree = new PuzzleTree(current);
+
+
+        int i = blankPosition.get('i');
+        int j = blankPosition.get('j');
+        boolean win = false;
+        fringe.offer(current);
+        int fringeSize = fringe.size();
+        while(!win){
+            tree.incrementExpanded();
+
+            if(current.winState()){
+                win = true;
+            }
+            if(current.getDepth() > tree.getDepth()){
+                tree.setDepth(current.getDepth());
+            }
+            created.add(current);
+            tree.incrementCreated();
+            visited.add(current);
+
+            if(j != 3){//MOVE RIGHT
+                char[][] state = makeCopy(current.getData());
+                PuzzleNode right = new PuzzleNode(moveRight(state), current.getDepth() + 1);
+                if(created.contains(right)){
+//                    System.out.println("NO THANK YOU!");
+                }else{
+                    System.out.println(right.toString());
+                    created.addLast(right);
+                    tree.incrementCreated();
+//                    created.add(right);
+                    if(visited.contains(right)){
+                        System.out.println("Visited indeed");
+                    } else {
+                        current.addChild(right);
+                        fringe.offer(right);
+                    }
+                }
+            }
+
+            if(i != 3){//MOVE DOWN
+                char[][] state = makeCopy(current.getData());
+                PuzzleNode down = new PuzzleNode(moveDown(state), current.getDepth() + 1);
+                if(created.contains(down)){
+//                    System.out.println("NO THANK YOU!");
+                }else{
+                    System.out.println(down.toString());
+                    created.addLast(down);
+                    tree.incrementCreated();
+//                    created.add(down);
+                    if(visited.contains(down)){
+                        System.out.println("Visited indeed");
+                    } else {
+                        current.addChild(down);
+                        fringe.offer(down);
+                    }
+                }
+            }
+
+            if(j != 0){//MOVE LEFT
+                char[][] state = makeCopy(current.getData());
+                PuzzleNode left = new PuzzleNode(moveLeft(state), current.getDepth() + 1);
+                if(created.contains(left)){
+//                    System.out.println("NO THANK YOU!");
+                }else{
+                    System.out.println(left.toString());
+                    created.addLast(left);
+                    tree.incrementCreated();
+//                    created.add(left);
+                    if(visited.contains(left)){
+                        System.out.println("Visited indeed");
+                    } else {
+                        current.addChild(left);
+                        fringe.offer(left);
+                    }
+                }
+            }
+
+            if(i != 0){//MOVE UP
+                char[][] state = makeCopy(current.getData());
+                PuzzleNode up = new PuzzleNode(moveUp(state), current.getDepth() + 1);
+                if(created.contains(up)){
+//                    System.out.println("NO THANK YOU!");
+                }else{
+                    System.out.println(up.toString());
+                    created.addLast(up);
+                    tree.incrementCreated();
+//                    created.add(up);
+                    if(visited.contains(up)){
+                        System.out.println("Visited indeed");
+                    } else {
+                        current.addChild(up);
+                        fringe.offer(up);
+                    }
+                }
+            }
+
+            if(fringe.size()>fringeSize){
+                fringeSize = fringe.size();
+            }
+            if(!fringe.isEmpty()){
+                current = fringe.poll();
+                Map<Character, Integer> coord = getBlank(current.getData());
+                i = coord.get('i');
+                j = coord.get('j');
+            }
+
+
+        }
+
+
+
+        return tree.getDepth() + " "+ tree.getCreated() + " " + tree.getExpanded() + " "+ fringeSize;
     }
 
     //TODO
     /**
+     * Runs a Depth First search on the tree.
      *
-     * @return
+     * @return String with results from the search
      */
     public String DFS(){
         Stack<PuzzleNode> fringe = new Stack<>();
+        LinkedList<PuzzleNode> created = new LinkedList<>(); //store the string
         ArrayList<PuzzleNode> visited = new ArrayList<>();
-        ArrayList<PuzzleNode> created = new ArrayList<>();
-        PuzzleTree temp = myTree;
-        PuzzleNode current = temp.getRoot();
-        created.add(current);
-        StringBuilder toReturn = new StringBuilder();
 
-        return myTree.getDepth() + " "+ myTree.getCreated() + " " + myTree.getExpanded() + " "+ myTree.getMaxFringe();
+        PuzzleTree tree = myTree;
+        PuzzleNode current = tree.getRoot();
+        created.add(current);
+        tree.incrementCreated();
+        int row = getRow(current.getData(), ' ');
+        int column = getColumn(current.getData(), ' ');
+        int i = blankPosition.get('i');
+        int j = blankPosition.get('j');
+        boolean win = false;
+        int fringeSize = fringe.size();
+        while(!win){
+            tree.incrementExpanded();
+
+            if(current.winState()){
+                win = true;
+            }
+            if(current.getDepth() > tree.getDepth()){
+                tree.setDepth(current.getDepth());
+            }
+
+
+            visited.add(current);
+
+            if(j != 3){//MOVE RIGHT
+                char[][] state = makeCopy(current.getData());
+                PuzzleNode right = new PuzzleNode(moveRight(state), current.getDepth() + 1);
+                if(created.contains(right)){
+                    System.out.println("NO THANK YOU!");
+                }else{
+                    System.out.println(right.toString());
+                    created.addLast(right);
+                    tree.incrementCreated();
+//                    created.add(right);
+                    if(visited.contains(right)){
+                        System.out.println("Visited indeed");
+                    } else {
+                        current.addChild(right);
+                        fringe.push(right);
+                    }
+                }
+            }
+
+            if(i != 3){//MOVE DOWN
+                char[][] state = makeCopy(current.getData());
+                PuzzleNode down = new PuzzleNode(moveDown(state), current.getDepth() + 1);
+                if(created.contains(down)){
+                    System.out.println("NO THANK YOU!");
+                }else{
+                    System.out.println(down.toString());
+                    created.addLast(down);
+                    tree.incrementCreated();
+//                    created.add(down);
+                    if(visited.contains(down)){
+                        System.out.println("Visited indeed");
+                    } else {
+                        current.addChild(down);
+                        fringe.push(down);
+                    }
+                }
+            }
+
+            if(j != 0){//MOVE LEFT
+                char[][] state = makeCopy(current.getData());
+                PuzzleNode left = new PuzzleNode(moveLeft(state), current.getDepth() + 1);
+                if(created.contains(left)){
+                    System.out.println("NO THANK YOU!");
+                }else{
+                    System.out.println(left.toString());
+                    created.addLast(left);
+                    tree.incrementCreated();
+//                    created.add(left);
+                    if(visited.contains(left)){
+                        System.out.println("Visited indeed");
+                    } else {
+                        current.addChild(left);
+                        fringe.push(left);
+                    }
+                }
+            }
+
+            if(i != 0){//MOVE UP
+                char[][] state = makeCopy(current.getData());
+                PuzzleNode up = new PuzzleNode(moveUp(state), current.getDepth() + 1);
+                if(created.contains(up)){
+                    System.out.println("NO THANK YOU!");
+                }else{
+                    System.out.println(up.toString());
+                    created.addLast(up);
+                    tree.incrementCreated();
+//                    created.add(up);
+                    if(visited.contains(up)){
+                        System.out.println("Visited indeed");
+                    } else {
+                        current.addChild(up);
+                        fringe.push(up);
+                    }
+                }
+            }
+
+            if(fringe.size()>fringeSize){
+                fringeSize = fringe.size();
+            }
+            if(!fringe.isEmpty()){
+                current = fringe.pop();
+                Map<Character, Integer> coord = getBlank(current.getData());
+                i = coord.get('i');
+                j = coord.get('j');
+            }
+        }
+
+
+
+        return tree.getDepth() + " "+ tree.getCreated() + " " + tree.getExpanded() + " "+ fringeSize;
     }
 
     //TODO
@@ -329,21 +377,152 @@ public class Board {
      * @return
      */
     public String GBFS(){
-        StringBuilder toReturn = new StringBuilder();
+        ArrayList<PuzzleNode> created = new ArrayList<>();
+        ArrayList<PuzzleNode> visited = new ArrayList<>();
 
-        return toReturn.toString();
+        //which heuristic are we using?
+        int heuristic = myHeuristic;
+        myRoot = new PuzzleNode(myBoard, 0, heuristic);
+
+
+        PuzzleTree tree = new PuzzleTree(myRoot);
+        PuzzleNode current = tree.getRoot();
+        created.add(current);
+        tree.incrementCreated();
+
+        //the position of the blank tile
+        int i = blankPosition.get('i');
+        int j = blankPosition.get('j');
+
+        //runs the while loop like a boss
+        boolean win = false;
+        int fringeSize = 0;
+        while(!win){
+            PriorityQueue<PuzzleNode> fringe = new PriorityQueue<>();
+            tree.incrementExpanded();
+
+            if(current.winState()){
+                win = true;
+            }
+            if(current.getDepth() > tree.getDepth()){
+                tree.setDepth(current.getDepth());
+            }
+
+            if(j != 3){//MOVE RIGHT
+                char[][] state = makeCopy(current.getData());
+                PuzzleNode right = new PuzzleNode(moveRight(state), current.getDepth() + 1);
+                if(created.contains(right)){
+                    System.out.println("NO THANK YOU!");
+                }else{
+                    System.out.println(right.toString());
+                    created.add(right);
+                    tree.incrementCreated();
+//                    created.add(up);
+                    if(visited.contains(right)){
+                        System.out.println("Visited indeed");
+                    } else {
+                        current.addChild(right);
+                        fringe.offer(right);
+                    }
+                }
+            }
+
+            if(i != 3){//MOVE DOWN
+                char[][] state = makeCopy(current.getData());
+                PuzzleNode down = new PuzzleNode(moveDown(state), current.getDepth() + 1);
+                if(created.contains(down)){
+                    System.out.println("NO THANK YOU!");
+                }else{
+                    System.out.println(down.toString());
+                    created.add(down);
+                    tree.incrementCreated();
+//                    created.add(up);
+                    if(visited.contains(down)){
+                        System.out.println("Visited indeed");
+                    } else {
+                        current.addChild(down);
+                        fringe.offer(down);
+                    }
+                }
+            }
+
+            if(j != 0){//MOVE LEFT
+                char[][] state = makeCopy(current.getData());
+                PuzzleNode left = new PuzzleNode(moveLeft(state), current.getDepth() + 1);
+                if(created.contains(left)){
+                    System.out.println("NO THANK YOU!");
+                }else{
+                    System.out.println(left.toString());
+                    created.add(left);
+                    tree.incrementCreated();
+//                    created.add(up);
+                    if(visited.contains(left)){
+                        System.out.println("Visited indeed");
+                    } else {
+                        current.addChild(left);
+                        fringe.offer(left);
+                    }
+                }
+            }
+
+            if(i != 0){//MOVE UP
+                char[][] state = makeCopy(current.getData());
+                PuzzleNode up = new PuzzleNode(moveUp(state), current.getDepth() + 1);
+                if(created.contains(up)){
+                    System.out.println("NO THANK YOU!");
+                }else{
+                    System.out.println(up.toString());
+                    created.add(up);
+                    tree.incrementCreated();
+//                    created.add(up);
+                    if(visited.contains(up)){
+                        System.out.println("Visited indeed");
+                    } else {
+                        current.addChild(up);
+                        fringe.offer(up);
+                    }
+                }
+            }
+
+            visited.add(current);
+
+            if(fringe.size()>fringeSize){
+                fringeSize = fringe.size();
+            }
+
+            if(!fringe.isEmpty()){
+                current = fringe.poll();
+                Map<Character, Integer> coord = getBlank(current.getData());
+                i = coord.get('i');
+                j = coord.get('j');
+            }
+            System.out.println("Let's do that again?");
+        }
+
+
+        return tree.getDepth() + " "+ tree.getCreated() + " " + tree.getExpanded() + " "+ fringeSize;
+
+    }
+
+    /**
+     * Runs the AStar algorithm.
+     * @return A string with the results of the search algorithm
+     */
+    public String AStar(){
+        String toReturn  = "";
+
+        return toReturn;
     }
 
 
-    public String toString(){
-        return myTree.getDepth() + ", " + myTree.getCreated() + ", " + myTree.getExpanded() + ", " + myTree.getMaxFringe();
-
-    }
 
     private Boolean winState(String stateToCheck){
         return WIN_STATES.contains(stateToCheck);
     }
 
+    /*
+    Helper method to figure out where the blank tile is.
+     */
     private Map getBlank(char[][] currentBoard){
 
         Map<Character, Integer> cooridinates = new HashMap<>();
@@ -435,28 +614,99 @@ public class Board {
         return newCopy;
     }
 
+    /*
+    Helper method that returns a collection of possible moves
+     */
+    private ArrayList<PuzzleNode> movesNoH(PuzzleNode current, int i, int j){
 
-    /** HELPER METHODS FOR BFS*/
-    private void addToFringeBFS(Queue<PuzzleNode> theFringe, ArrayList<PuzzleNode> theVisited, PuzzleNode current,
-                                PuzzleNode toAdd){
-        current.addChild(toAdd);
-        myTree.incrementCreated();
-        if(!theVisited.contains(toAdd)){
-            theFringe.add(toAdd);
-            myTree.incrementMaxFringe();
-            theVisited.add(toAdd);
+        ArrayList<PuzzleNode> ns = new ArrayList<>();
+        //Handle right edge case
+        if(j != myBoard.length - 1){
+            char[][] data = makeCopy(current.getData());
+            PuzzleNode right = new PuzzleNode(moveRight(data), current.getDepth() + 1);
+            ns.add(right);
         }
+
+        //Handle bottom edge case
+        if(i != myBoard.length - 1){
+            char[][] data = makeCopy(current.getData());
+            PuzzleNode down = new PuzzleNode(moveDown(data), current.getDepth() + 1);
+            ns.add(down);
+        }
+
+        //Handle left edge case
+        if(j != 0){
+            char[][] data = makeCopy(current.getData());
+            PuzzleNode left = new PuzzleNode(moveLeft(data), current.getDepth()+ 1);
+            ns.add(left);
+        }
+
+        //Handle top edge case
+        if(i != 0){
+            char[][] data = makeCopy(current.getData());
+            PuzzleNode up = new PuzzleNode(moveUp(data), current.getDepth() + 1);
+            ns.add(up);
+        }
+
+        return ns;
     }
 
-    private void addToFringeDFS(Stack<PuzzleNode> theFringe, ArrayList<PuzzleNode> theVisited, PuzzleNode current,
-                                PuzzleNode toAdd){
-        current.addChild(toAdd);
-        myTree.incrementCreated();
-        if(!theVisited.contains(toAdd)){
-            theFringe.add(toAdd);
-            myTree.incrementMaxFringe();
-            theVisited.add(toAdd);
+    private int getRow(char[][] state, char tile){
+        for(int row = 0; row < state.length; row++){
+            for(int column = 0; column < state.length; column++){
+                if(state[row][column] == tile){
+                    return row;
+                }
+            }
         }
+
+        return -1;
     }
 
+    private int getColumn(char[][] state, char tile){
+        for(int row = 0; row < state.length; row++){
+            for(int column = 0; column < state.length; column++){
+                if(state[row][column] == tile){
+                    return column;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    private PriorityQueue<PuzzleNode> movesWithH(PuzzleNode current, int i, int j, int heuristic){
+
+        PriorityQueue<PuzzleNode> ns = new PriorityQueue<>();
+        //Handle right edge case
+        if(j != myBoard.length){
+            char[][] data = makeCopy(myBoard);
+            PuzzleNode right = new PuzzleNode(moveRight(data), current.getDepth() + 1, heuristic);
+            ns.offer(right);
+        }
+
+        //Handle bottom edge case
+        if(i != myBoard.length){
+            char[][] data = makeCopy(myBoard);
+            PuzzleNode down = new PuzzleNode(moveDown(data), current.getDepth() + 1, heuristic);
+            ns.offer(down);
+        }
+
+        //Handle left edge case
+        if(j != 0){
+            char[][] data = makeCopy(myBoard);
+            PuzzleNode left = new PuzzleNode(moveLeft(data), current.getDepth()+ 1, heuristic);
+            ns.offer(left);
+        }
+
+        //Handle top edge case
+        if(i != 0){
+            char[][] data = makeCopy(myBoard);
+            PuzzleNode up = new PuzzleNode(moveUp(data), current.getDepth() + 1, heuristic);
+            ns.offer(up);
+        }
+
+        return ns;
+
+    }
 }

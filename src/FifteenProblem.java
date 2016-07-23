@@ -13,10 +13,12 @@ public class FifteenProblem {
 
     public static void main (String[] args) {
         /*For testing manual input because I'm lazy*/
-        args = new String[2];
-        args[0] = "123456789ABC DEF";
+        args = new String[3];
+        args[0] = "123456789AB CDEF";
+//        args[0] = "1234678C5A B9DEF";
 //        args[0] = "123456789ABCDEF ";
         args[1] = "BFS";
+        args[2] = "h1";
         Board myBoard;
 
         if(args.length > 3){
@@ -41,18 +43,41 @@ public class FifteenProblem {
                         "Please choose one of the following: " + SEARCHES.toString());
                 return;
             }
-            myBoard = new Board(toUp);
+
 
             if(args[1].equals("BFS")){ //BREADTH FIRST
-                String result = myBoard.BFS();
-                System.out.println(result);
+                myBoard = new Board(toUp);
+                System.out.println(myBoard.BFS());
+//                String result = myBoard.BFS();
+//                System.out.println(result);
             } else if(args[1].equals("DFS")){ //DEPTH FIRST
-
+                myBoard = new Board(toUp);
+                System.out.println(myBoard.DFS());
             } else if(args[1].equals("DLS")){ //DEPTH LIMITED
 
             } else if(args[1].equals("GBFS")){ // GREEDY BEST-FIRST
+                int heuristic;
+                if(args[2] != null && args[2].equals("h1")){
+                    heuristic = 1;
+                    myBoard = new Board(toUp, heuristic);
+                    System.out.println(myBoard.GBFS());
+                } else if(args[2] != null && args[2].equals("h2")){
+                    heuristic = 2;
+                    myBoard = new Board(toUp, heuristic);
+                    System.out.println(myBoard.GBFS());
+
+                } else {
+                    System.out.println("GBFS only takes two heuristics: h1 AND h2");
+                }
 
             } else if(args[1].equals("AStar")){ //A*
+                if(args[2] != null && args[2].equals("h1")){
+
+                } else if(args[2] != null && args[2].equals("h2")){
+
+                } else {
+                    System.out.println("Astar only takes two heuristics: h1 AND h2");
+                }
 
             } else if(args[1].equals("ID")){ //Iterative Deepening
 
