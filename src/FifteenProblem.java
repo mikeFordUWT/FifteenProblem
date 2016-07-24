@@ -17,8 +17,8 @@ public class FifteenProblem {
         args[0] = "123456789AB CDEF";
 //        args[0] = "1234678C5A B9DEF";
 //        args[0] = "123456789ABCDEF ";
-        args[1] = "BFS";
-        args[2] = "h1";
+        args[1] = "GBFS";
+        args[2] = "h2";
         Board myBoard;
 
         if(args.length > 3){
@@ -60,11 +60,11 @@ public class FifteenProblem {
                 if(args[2] != null && args[2].equals("h1")){
                     heuristic = 1;
                     myBoard = new Board(toUp, heuristic);
-                    System.out.println(myBoard.GBFS());
+                    System.out.println(myBoard.GBFS(1));
                 } else if(args[2] != null && args[2].equals("h2")){
                     heuristic = 2;
                     myBoard = new Board(toUp, heuristic);
-                    System.out.println(myBoard.GBFS());
+                    System.out.println(myBoard.GBFS(2));
 
                 } else {
                     System.out.println("GBFS only takes two heuristics: h1 AND h2");

@@ -1,10 +1,12 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * A PuzzleNode class that implement comparable for use in a PuzzleTree for a tile puzzle.
  */
 public class PuzzleNode implements Comparable<PuzzleNode>{
+    private final char BLANK = ' ';
     private final ArrayList<String> WIN_STATES =
             new ArrayList<>(Arrays.asList("123456789ABCDEF ", "123456789ABCDFE "));
 
@@ -27,7 +29,7 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         myDepth = theDepth;
         myKids = new ArrayList<>();
         myMisplacedTiles = misplacedTiles();
-        myTotalMovesToWin = 0;
+        myTotalMovesToWin = movesToWin();
         myParent = null;
     }
 
@@ -44,7 +46,7 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         myHeuristic = theHeuristic;
         myKids = new ArrayList<>();
         myMisplacedTiles = misplacedTiles();
-        myTotalMovesToWin = 0;
+        myTotalMovesToWin = movesToWin();
         myParent = null;
 
     }
@@ -197,34 +199,37 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
                 {'9', 'A', 'B', 'C'},
                 {'D', 'F', 'E', ' '}};
 
-        ArrayList<Integer> ONE = new ArrayList<>(Arrays.asList(0,0));
-        ArrayList<Integer> oneActual = findTile('1');
 
-        ArrayList<Integer> TWO = new ArrayList<>(Arrays.asList(0,1));
-        ArrayList<Integer> twoActual = findTile('2');
+        HashMap<Character, ArrayList<Integer>> coords = new HashMap<>();
+        //Put win positions into a HashMap
+        for(int i = 0; i <win1.length; i++){
+            for(int j = 0; j <win1.length; j++){
+                ArrayList<Integer> place = new ArrayList<>();
+                place.add(i);
+                place.add(j);
+                char tile = win1[i][j];
+                coords.put(tile,place);
+            }
+        }
 
-        ArrayList<Integer> THREE = new ArrayList<>(Arrays.asList(0,2));
-        ArrayList<Integer> threeActual = findTile('3');
+        //loop over current state to see manhattan distance of each tile
+        for(int i = 0; i < myData.length; i++){
+            for(int j = 0; j < myData.length; j++){
+                int row = this.getRow(myData[i][j]);
+                int column = this.getColumn(myData[i][j]);
+                char tile = myData[i][j];
+                if(tile != win1[i][j] && tile!=BLANK){
 
-        ArrayList<Integer> FOUR = new ArrayList<>(Arrays.asList(0,3));
-        ArrayList<Integer> fourActual = findTile('4');
+                    int rowDiff = Math.abs(coords.get(tile).get(0) - row);
+                    int colDiff = Math.abs(coords.get(tile).get(1) - column);
 
-        ArrayList<Integer> FIVE = new ArrayList<>(Arrays.asList(1,0));
-        ArrayList<Integer> fiveActual = findTile('5');
+                    toReturn += rowDiff + colDiff;
 
-        ArrayList<Integer> SIX = new ArrayList<>(Arrays.asList(1,1));
-        ArrayList<Integer> SEVEN = new ArrayList<>(Arrays.asList(1,2));
-        ArrayList<Integer> EIGHT = new ArrayList<>(Arrays.asList(1,3));
-        ArrayList<Integer> NINE = new ArrayList<>(Arrays.asList(2,0));
-        ArrayList<Integer> A = new ArrayList<>(Arrays.asList(2,1));
-        ArrayList<Integer> B = new ArrayList<>(Arrays.asList(2,2));
-        ArrayList<Integer> C = new ArrayList<>(Arrays.asList(2,3));
-        ArrayList<Integer> D = new ArrayList<>(Arrays.asList(3,0));
-        ArrayList<Integer> E1 = new ArrayList<>(Arrays.asList(3,1));
-        ArrayList<Integer> E2 = new ArrayList<>(Arrays.asList(3,2));
-        ArrayList<Integer> F1 = new ArrayList<>(Arrays.asList(3,2));
-        ArrayList<Integer> F2 = new ArrayList<>(Arrays.asList(3,1));
-        ArrayList<Integer> BLANK = new ArrayList<>(Arrays.asList(3,3));
+                }
+
+            }
+        }
+
 
 
 
@@ -279,6 +284,30 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
      */
     public boolean leafNode(){
         return myKids.size() == 0;
+    }
+
+    public int getRow( char tile){
+        for(int row = 0; row < myData.length; row++){
+            for(int column = 0; column < myData.length; column++){
+                if(myData[row][column] == tile){
+                    return row;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    public int getColumn( char tile){
+        for(int row = 0; row < myData.length; row++){
+            for(int column = 0; column < myData.length; column++){
+                if(myData[row][column] == tile){
+                    return column;
+                }
+            }
+        }
+
+        return -1;
     }
 
     /**
