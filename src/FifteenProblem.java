@@ -22,8 +22,10 @@ public class FifteenProblem {
         args[1] = "AStar";
 //        args[1] = "GBFS";
         args[1] = "DLS";
-        args[2] = "h2";
+//        args[2] = "h2";
+        args[2] = "14";
         Board myBoard;
+
 
         if(args.length > 3){
             System.out.println("TOO MANY ARGUMENTS\nARGS: [\"initialstate\"] [searchmethod] [options]");
@@ -58,8 +60,15 @@ public class FifteenProblem {
                 myBoard = new Board(toUp);
                 System.out.println(myBoard.DFS());
             } else if(args[1].equals("DLS")){ //DEPTH LIMITED
-                myBoard = new Board(toUp);
-                System.out.println(myBoard.DLS(4));
+                boolean parse = isParseable(args[2]);
+                if(parse){
+                    myBoard = new Board(toUp);
+                    int arg = Integer.parseInt(args[2]);
+                    System.out.println(myBoard.DLS(arg));
+                }else{
+                    System.out.println("The second argument is not an Integer");
+                }
+
             } else if(args[1].equals("GBFS")){ // GREEDY BEST-FIRST
                 int heuristic;
                 if(args[2] != null && args[2].equals("h1")){
@@ -94,4 +103,19 @@ public class FifteenProblem {
 //            System.out.println(myBoard.toString());
         }
     }
+
+    static boolean isParseable(String toParse){
+        boolean p = true;
+        try{
+            Integer.parseInt(toParse);
+        }catch (NumberFormatException e){
+            p = false;
+        }
+
+        return p;
+    }
 }
+
+
+
+
