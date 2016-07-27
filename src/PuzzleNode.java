@@ -18,6 +18,8 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
     private int myTotalMovesToWin;
     private int myHeuristic;
 
+    private int myAStarValue;
+
     /**
      * Constructor that just takes a 2d matrix of chars and the depth of the node.
      *
@@ -47,6 +49,12 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         myKids = new ArrayList<>();
         myMisplacedTiles = misplacedTiles();
         myTotalMovesToWin = movesToWin();
+
+        if(theHeuristic == 3){
+            myAStarValue = myMisplacedTiles + this.rowsOutOfPlace();
+        } else if(theHeuristic == 4){
+            myAStarValue = myTotalMovesToWin + this.rowsOutOfPlace();
+        }
         myParent = null;
 
     }
@@ -193,12 +201,6 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
                 {'5', '6', '7', '8'},
                 {'9', 'A', 'B', 'C'},
                 {'D', 'E', 'F', ' '}};
-        char[][] win2 = {
-                {'1', '2', '3', '4'},
-                {'5', '6', '7', '8'},
-                {'9', 'A', 'B', 'C'},
-                {'D', 'F', 'E', ' '}};
-
 
         HashMap<Character, ArrayList<Integer>> coords = new HashMap<>();
         //Put win positions into a HashMap
@@ -262,6 +264,61 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         return WIN_STATES.contains(this.toString());
     }
 
+
+    public int getAStarValue(){
+        return myAStarValue;
+    }
+
+    public void setAStarValue(int theValue){
+        myAStarValue = theValue;
+    }
+    /**
+     * Get the number of tiles out of place.
+     *
+     * @return integer representing the tiles not in there proper row
+     */
+    public int rowsOutOfPlace(){
+
+        char[][] win1 = {
+                {'1', '2', '3', '4'},
+                {'5', '6', '7', '8'},
+                {'9', 'A', 'B', 'C'},
+                {'D', 'E', 'F', ' '}};
+
+        HashMap<Character, ArrayList<Integer>> coords = new HashMap<>();
+        //Put win positions into a HashMap
+        for(int i = 0; i <win1.length; i++){
+            for(int j = 0; j <win1.length; j++){
+                ArrayList<Integer> place = new ArrayList<>();
+                place.add(i);
+                place.add(j);
+                char tile = win1[i][j];
+                coords.put(tile,place);
+            }
+        }
+
+
+        int count = 0;
+        for(int i = 0; i < myData.length; i++){
+            for(int j = 0; j < myData.length; j++){
+                int row = this.getRow(myData[i][j]);
+                int column = this.getColumn(myData[i][j]);
+                char tile = myData[i][j];
+                if(tile != win1[i][j] && tile!=BLANK){
+
+                    boolean rowDiff = Math.abs(coords.get(tile).get(0) - row) != 0;
+                    boolean colDiff = Math.abs(coords.get(tile).get(1) - column) != 0;
+
+                    if(rowDiff){count++;}
+                    if(colDiff){count++;}
+
+                }
+            }
+        }
+
+        return count;
+    }
+
     /**
      * Gets a string of the puzzle state.
      *
@@ -298,7 +355,8 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         return -1;
     }
 
-    public int getColumn( char tile){
+
+    public int getColumn(char tile){
         for(int row = 0; row < myData.length; row++){
             for(int column = 0; column < myData.length; column++){
                 if(myData[row][column] == tile){
@@ -337,7 +395,6 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
             } else if(myMisplacedTiles < o.getMisplacedTiles()){
                 compare = -1;
             }
-//            return compare;
         }
 
         if(myHeuristic == 2 && o.getHeuristic() == 2){//heuristic 2
@@ -351,6 +408,17 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
             }
 
         }
+
+        if((myHeuristic == 3 && o.getHeuristic() == 3) || (myHeuristic == 4 && o.getHeuristic() == 4)){//Heuristic 1 + tiles and rows
+            if(myAStarValue > o.getAStarValue()){
+                compare = 1;
+            }else if(myAStarValue == o.getAStarValue()){
+                compare = 0;
+            }else if(myAStarValue < o.getAStarValue()){
+                compare = -1;
+            }
+        }
+
         return compare;
     }
 }

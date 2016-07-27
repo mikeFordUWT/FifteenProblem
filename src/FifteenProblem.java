@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 
 /**
  * Created by Mike on 7/6/16.
@@ -17,8 +18,8 @@ public class FifteenProblem {
         args[0] = "123456789AB CDEF";
 //        args[0] = "1234678C5A B9DEF";
 //        args[0] = "123456789ABCDEF ";
-        args[1] = "GBFS";
-        args[2] = "h2";
+        args[1] = "AStar";
+        args[2] = "h1";
         Board myBoard;
 
         if(args.length > 3){
@@ -72,9 +73,13 @@ public class FifteenProblem {
 
             } else if(args[1].equals("AStar")){ //A*
                 if(args[2] != null && args[2].equals("h1")){
-
+                    int heuristic = 3;
+                    myBoard = new Board(toUp, heuristic);
+                    System.out.println(myBoard.AStar(heuristic));
                 } else if(args[2] != null && args[2].equals("h2")){
-
+                    int heuristic = 4;
+                    myBoard = new Board(toUp, heuristic);
+                    System.out.println(myBoard.AStar(heuristic));
                 } else {
                     System.out.println("Astar only takes two heuristics: h1 AND h2");
                 }
