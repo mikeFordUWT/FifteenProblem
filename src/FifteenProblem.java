@@ -15,11 +15,13 @@ public class FifteenProblem {
     public static void main (String[] args) {
         /*For testing manual input because I'm lazy*/
         args = new String[3];
-        args[0] = "123456789AB CDEF";
+        args[0] = " 123456789ABCDEF";
+//        args[0] = " FEDCBA987654321";
 //        args[0] = "1234678C5A B9DEF";
 //        args[0] = "123456789ABCDEF ";
         args[1] = "AStar";
-        args[2] = "h1";
+//        args[1] = "GBFS";
+        args[2] = "h2";
         Board myBoard;
 
         if(args.length > 3){
@@ -60,11 +62,11 @@ public class FifteenProblem {
                 int heuristic;
                 if(args[2] != null && args[2].equals("h1")){
                     heuristic = 1;
-                    myBoard = new Board(toUp, heuristic);
+                    myBoard = new Board(toUp);
                     System.out.println(myBoard.GBFS(1));
                 } else if(args[2] != null && args[2].equals("h2")){
                     heuristic = 2;
-                    myBoard = new Board(toUp, heuristic);
+                    myBoard = new Board(toUp);
                     System.out.println(myBoard.GBFS(2));
 
                 } else {
@@ -74,11 +76,11 @@ public class FifteenProblem {
             } else if(args[1].equals("AStar")){ //A*
                 if(args[2] != null && args[2].equals("h1")){
                     int heuristic = 3;
-                    myBoard = new Board(toUp, heuristic);
+                    myBoard = new Board(toUp);
                     System.out.println(myBoard.AStar(heuristic));
                 } else if(args[2] != null && args[2].equals("h2")){
                     int heuristic = 4;
-                    myBoard = new Board(toUp, heuristic);
+                    myBoard = new Board(toUp);
                     System.out.println(myBoard.AStar(heuristic));
                 } else {
                     System.out.println("Astar only takes two heuristics: h1 AND h2");

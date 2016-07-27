@@ -26,13 +26,13 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
      * @param theData the matrix of chars that represent tiles in the puzzle
      * @param theDepth the Integer representation of the node's depth in the tree
      */
-    public PuzzleNode(char[][] theData, int theDepth){
+    public PuzzleNode(char[][] theData, int theDepth, PuzzleNode theParent){
         myData = theData;
         myDepth = theDepth;
         myKids = new ArrayList<>();
         myMisplacedTiles = misplacedTiles();
         myTotalMovesToWin = movesToWin();
-        myParent = null;
+        myParent = theParent;
     }
 
     /**
@@ -42,20 +42,19 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
      * @param theDepth the Integer representation if the node's depth in the tree
      * @param theHeuristic the heuristic to use for choosing a move
      */
-    public PuzzleNode(char[][] theData, int theDepth, int theHeuristic){
+    public PuzzleNode(char[][] theData, int theDepth, int theHeuristic, PuzzleNode theParent){
         myData = theData;
         myDepth = theDepth;
         myHeuristic = theHeuristic;
         myKids = new ArrayList<>();
         myMisplacedTiles = misplacedTiles();
         myTotalMovesToWin = movesToWin();
-
+        myParent = theParent;
         if(theHeuristic == 3){
             myAStarValue = myMisplacedTiles + this.rowsOutOfPlace();
         } else if(theHeuristic == 4){
             myAStarValue = myTotalMovesToWin + this.rowsOutOfPlace();
         }
-        myParent = null;
 
     }
 
@@ -409,13 +408,25 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
 
         }
 
-        if((myHeuristic == 3 && o.getHeuristic() == 3) || (myHeuristic == 4 && o.getHeuristic() == 4)){//Heuristic 1 + tiles and rows
+        if((myHeuristic == 3 && o.getHeuristic() == 3)){//Heuristic 1 + tiles and rows
             if(myAStarValue > o.getAStarValue()){
                 compare = 1;
             }else if(myAStarValue == o.getAStarValue()){
                 compare = 0;
             }else if(myAStarValue < o.getAStarValue()){
                 compare = -1;
+            }
+        }
+
+        if(myHeuristic == 4 && o.getHeuristic() == 4){
+            int first = myMisplacedTiles + myTotalMovesToWin;
+            int second = o.getMisplacedTiles() + o.getTotalMovesToWin();
+            if(first > second){
+                compare = 1;
+            }else if(first < second){
+                compare = -1;
+            }else{
+                compare = 0;
             }
         }
 

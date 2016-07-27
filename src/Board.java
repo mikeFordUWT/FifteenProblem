@@ -9,10 +9,6 @@ public class Board {
     private final ArrayList<String> WIN_STATES =
             new ArrayList<>(Arrays.asList("123456789ABCDEF ", "123456789ABCDFE "));
     private char[][] myBoard;
-    private PuzzleTree myTree;
-    private PuzzleNode myRoot;
-    private Map<Character, Integer> blankPosition;
-    private int myHeuristic;
 
     /**
      * Constructor for when no heuristic is needed.
@@ -28,34 +24,9 @@ public class Board {
                 k++;
             }
         }
-        PuzzleNode root = new PuzzleNode(myBoard, 0);
-        myTree = new PuzzleTree(root);
-        System.out.println(myTree.getRoot().checkState());
-        blankPosition = getBlank(myBoard);
+        PuzzleNode check = new PuzzleNode(myBoard, 0, null);
+//        System.out.println(check.checkState());
 
-
-    }
-
-    /**
-     * Board constructor for searches with a Heuristic
-     *
-     * @param startState 2D Array start state for puzzle
-     * @param theHeuristic the Heuristic to be uses: 1 for misplaced tiles, 2 for total moves until win
-     */
-    public Board(String startState, int theHeuristic){
-        myBoard = new char[4][4];
-        int k = 0;
-        for(int i=0; i< 4; i++){
-            for(int j = 0; j <4; j++){
-                myBoard[i][j] = startState.charAt(k);
-                k++;
-            }
-        }
-        myHeuristic = theHeuristic;
-        PuzzleNode root = new PuzzleNode(myBoard, 0, theHeuristic);
-        myTree = new PuzzleTree(root);
-        System.out.println(myTree.getRoot().checkState());
-        blankPosition = getBlank(myBoard);
     }
 
     /**
@@ -78,7 +49,7 @@ public class Board {
         LinkedList<PuzzleNode> created = new LinkedList<>(); //store the string
         ArrayList<PuzzleNode> visited = new ArrayList<>();
 
-        PuzzleNode current = new PuzzleNode(myBoard, 0);
+        PuzzleNode current = new PuzzleNode(myBoard, 0, null);
         PuzzleTree tree = new PuzzleTree(current);
         created.add(current);
 
@@ -136,8 +107,9 @@ public class Board {
         LinkedList<PuzzleNode> created = new LinkedList<>(); //store the string
         ArrayList<PuzzleNode> visited = new ArrayList<>();
 
-        PuzzleNode current = new PuzzleNode(myBoard, 0);
-        PuzzleTree tree = new PuzzleTree(current);
+        PuzzleNode root = new PuzzleNode(myBoard, 0, null);
+        PuzzleTree tree = new PuzzleTree(root);
+        PuzzleNode current = root;
         created.add(current);
 
         fringe.push(current);
@@ -194,7 +166,8 @@ public class Board {
         int createdNodes = 0;
         int expanded = 0;
 
-        PuzzleNode current = new PuzzleNode(myBoard, 0, heuristic);
+        PuzzleNode current = new PuzzleNode(myBoard, 0, heuristic, null);
+        PuzzleNode goal = current;
         PuzzleTree tree = new PuzzleTree(current);
         created.add(current);
         createdNodes++;
@@ -206,6 +179,7 @@ public class Board {
             expanded++;
             if(current.winState()){
                 win = true;
+                goal = current;
             }
 
             if(current.getDepth() > tree.getDepth()){
@@ -239,6 +213,21 @@ public class Board {
             }
         }
 
+        current = goal;
+        ArrayList<PuzzleNode> path = new ArrayList<>();
+        while(current.getParent()!=null){
+            path.add(current);
+            current = current.getParent();
+        }
+        path.add(current);
+
+        Collections.reverse(path);
+
+        for(int i = 0; i<path.size(); i++){
+            System.out.println(i+1);
+            System.out.println(path.get(i).checkState());
+        }
+        System.out.println("PATH LENGTH: " + path.size());
         return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
     }
     //TODO update with stuff
@@ -251,20 +240,23 @@ public class Board {
         ArrayList<PuzzleNode> visited = new ArrayList<>();
         ArrayList<PuzzleNode> created = new ArrayList<>();
 
-        PuzzleNode root = new PuzzleNode(myBoard, 0, theHeuristic);
+        PuzzleNode root = new PuzzleNode(myBoard, 0, theHeuristic, null);
         int createdNodes = 1;
         PuzzleTree tree = new PuzzleTree(root);
         fringe.offer(root);
         int fringeSize = fringe.size();
+
         PuzzleNode current = fringe.poll();
+        PuzzleNode goal = current;
         int expanded = 0;
         int row = current.getRow(BLANK);
         int column = current.getColumn(BLANK);
 
         boolean win = false;
         while(!win){
-            if(current.winState()){
+            if(winState(current.toString())){
                 win = true;
+                goal = current;
             }
             expanded++;
 
@@ -299,8 +291,23 @@ public class Board {
             }
         }
 
+        //Prints out the solution path and the size of the path
+        current = goal;
+        ArrayList<PuzzleNode> path = new ArrayList<>();
+        while(current.getParent()!=null){
+            path.add(current);
+            current = current.getParent();
+        }
+        path.add(current);
 
+        Collections.reverse(path);
 
+        for(int i = 0; i<path.size(); i++){
+            System.out.println(i+1);
+            System.out.println(path.get(i).checkState());
+        }
+
+        System.out.println("PATH LENGTH: " + path.size());
         return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
     }
 
@@ -413,28 +420,28 @@ public class Board {
         //Handle right edge case
         if(j != myBoard.length - 1){
             char[][] data = makeCopy(current.getData());
-            PuzzleNode right = new PuzzleNode(moveRight(data), current.getDepth() + 1);
+            PuzzleNode right = new PuzzleNode(moveRight(data), current.getDepth() + 1, current);
             ns.add(right);
         }
 
         //Handle bottom edge case
         if(i != myBoard.length - 1){
             char[][] data = makeCopy(current.getData());
-            PuzzleNode down = new PuzzleNode(moveDown(data), current.getDepth() + 1);
+            PuzzleNode down = new PuzzleNode(moveDown(data), current.getDepth() + 1, current);
             ns.add(down);
         }
 
         //Handle left edge case
         if(j != 0){
             char[][] data = makeCopy(current.getData());
-            PuzzleNode left = new PuzzleNode(moveLeft(data), current.getDepth()+ 1);
+            PuzzleNode left = new PuzzleNode(moveLeft(data), current.getDepth()+ 1, current);
             ns.add(left);
         }
 
         //Handle top edge case
         if(i != 0){
             char[][] data = makeCopy(current.getData());
-            PuzzleNode up = new PuzzleNode(moveUp(data), current.getDepth() + 1);
+            PuzzleNode up = new PuzzleNode(moveUp(data), current.getDepth() + 1, current);
             ns.add(up);
         }
 
@@ -471,28 +478,30 @@ public class Board {
         //Handle right edge case
         if(j != myBoard.length - 1){
             char[][] data = makeCopy(current.getData());
-            PuzzleNode right = new PuzzleNode(moveRight(data), current.getDepth() + 1, current.getHeuristic());
+            PuzzleNode right = new PuzzleNode(moveRight(data), current.getDepth() + 1, current.getHeuristic(), current);
             ns.add(right);
         }
 
         //Handle bottom edge case
         if(i != myBoard.length - 1){
             char[][] data = makeCopy(current.getData());
-            PuzzleNode down = new PuzzleNode(moveDown(data), current.getDepth() + 1, current.getHeuristic());
+            PuzzleNode down = new PuzzleNode(moveDown(data), current.getDepth() + 1, current.getHeuristic(), current);
+            down.setParent(current);
             ns.add(down);
         }
 
         //Handle left edge case
         if(j != 0){
             char[][] data = makeCopy(current.getData());
-            PuzzleNode left = new PuzzleNode(moveLeft(data), current.getDepth()+ 1, current.getHeuristic());
+            PuzzleNode left = new PuzzleNode(moveLeft(data), current.getDepth()+ 1, current.getHeuristic(), current);
             ns.add(left);
         }
 
         //Handle top edge case
         if(i != 0){
             char[][] data = makeCopy(current.getData());
-            PuzzleNode up = new PuzzleNode(moveUp(data), current.getDepth() + 1, current.getHeuristic());
+            PuzzleNode up = new PuzzleNode(moveUp(data), current.getDepth() + 1, current.getHeuristic(), current);
+            up.setParent(current);
             ns.add(up);
         }
 
