@@ -15,12 +15,13 @@ public class FifteenProblem {
     public static void main (String[] args) {
         /*For testing manual input because I'm lazy*/
         args = new String[3];
-        args[0] = " 123456789ABCDEF";
+        args[0] = "12345678 ABC9DEF";
 //        args[0] = " FEDCBA987654321";
 //        args[0] = "1234678C5A B9DEF";
 //        args[0] = "123456789ABCDEF ";
         args[1] = "AStar";
 //        args[1] = "GBFS";
+        args[1] = "DLS";
         args[2] = "h2";
         Board myBoard;
 
@@ -57,7 +58,8 @@ public class FifteenProblem {
                 myBoard = new Board(toUp);
                 System.out.println(myBoard.DFS());
             } else if(args[1].equals("DLS")){ //DEPTH LIMITED
-
+                myBoard = new Board(toUp);
+                System.out.println(myBoard.DLS(4));
             } else if(args[1].equals("GBFS")){ // GREEDY BEST-FIRST
                 int heuristic;
                 if(args[2] != null && args[2].equals("h1")){
@@ -85,8 +87,6 @@ public class FifteenProblem {
                 } else {
                     System.out.println("Astar only takes two heuristics: h1 AND h2");
                 }
-
-            } else if(args[1].equals("ID")){ //Iterative Deepening
 
             }
 //

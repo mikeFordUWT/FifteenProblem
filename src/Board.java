@@ -311,6 +311,86 @@ public class Board {
         return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
     }
 
+    public String DLS(int theDepth){
+        String toReturn = "";
+        Stack<PuzzleNode> fringe = new Stack<>();
+        LinkedList<PuzzleNode> created = new LinkedList<>(); //store the string
+        ArrayList<PuzzleNode> visited = new ArrayList<>();
+
+        PuzzleNode root = new PuzzleNode(myBoard, 0, null);
+        PuzzleTree tree = new PuzzleTree(root);
+        PuzzleNode current = root;
+        created.add(current);
+        PuzzleNode goal = current;
+        fringe.push(current);
+
+        int fringeSize = fringe.size();
+        int row = current.getRow(BLANK);
+        int column = current.getColumn(BLANK);
+        boolean win = false;
+        int bad = 0;
+        while(!win){
+            if(current.getDepth() > tree.getDepth()){
+                tree.setDepth(current.getDepth());
+            }
+
+            if(current.winState()){
+                win = true;
+                goal = current;
+            }
+
+
+            tree.incrementExpanded();
+            visited.add(current);
+            ArrayList<PuzzleNode> moves = movesNoH(current, row, column);
+            for(int i = 0; i< moves.size(); i++){
+                if(!created.contains(moves.get(i))){
+                    created.add(moves.get(i));
+                    if(!visited.contains(moves.get(i)) && moves.get(i).getDepth()<= theDepth){
+                        current.addChild(moves.get(i));
+                        fringe.push(moves.get(i));
+                    }
+                }
+            }
+
+            if(fringe.size() > fringeSize){
+                fringeSize = fringe.size();
+            }
+
+            if(fringe.isEmpty()){
+                bad = -1;
+                win = true;
+            }else{
+                current = fringe.pop();
+                row = current.getRow(BLANK);
+                column = current.getColumn(BLANK);
+            }
+        }
+
+        if(bad == -1){
+            toReturn = "-1";
+        }else{
+            current = goal;
+            ArrayList<PuzzleNode> path = new ArrayList<>();
+            while(current.getParent()!=null){
+                path.add(current);
+                current = current.getParent();
+            }
+            path.add(current);
+
+            Collections.reverse(path);
+
+            for(int i = 0; i<path.size(); i++){
+                System.out.println(i+1);
+                System.out.println(path.get(i).checkState());
+            }
+
+            System.out.println("PATH LENGTH: " + path.size());
+            toReturn = tree.getDepth() + " "+ created.size() + " " + tree.getExpanded() + " "+ fringeSize;
+        }
+        return toReturn;
+    }
+
 
 
     private Boolean winState(String stateToCheck){
