@@ -230,12 +230,94 @@ public class Board {
         System.out.println("PATH LENGTH: " + path.size());
         return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
     }
-    //TODO update with stuff
+
     /**
      * Runs the AStar algorithm.
      * @return A string with the results of the search algorithm
      */
     public String AStar(int theHeuristic){
+        PriorityQueue<PuzzleNode> open = new PriorityQueue<>();
+        ArrayList<PuzzleNode> closed = new ArrayList<>();
+
+        PuzzleNode root = new PuzzleNode(myBoard, 0, theHeuristic, null);
+        int createdNodes = 1;
+        PuzzleTree tree = new PuzzleTree(root);
+        open.offer(root);
+
+        int maxFringe = open.size();
+        PuzzleNode goal = root;
+        int expanded = 0;
+        int row = 0;
+        int column =0;
+        boolean win = false;
+        PuzzleNode current = tree.getRoot();
+        int bestPath = Integer.MAX_VALUE;
+        while(!win && !open.isEmpty()){
+            current = open.peek();
+            if(current.winState()){
+                win = true;
+                goal = current;
+            }
+            if(current.getDepth() > tree.getDepth()){
+                tree.setDepth(current.getDepth());
+            }
+            open.remove(current);
+            closed.add(current);
+            row = current.getRow(BLANK);
+            column = current.getColumn(BLANK);
+            expanded++;
+
+
+            ArrayList<PuzzleNode> neighbors = movesWithH(current, row, column);
+            for(int i  = 0; i< neighbors.size(); i++){
+                PuzzleNode neighbor = neighbors.get(i);
+
+                if(!closed.contains(neighbor)){
+                    current.addChild(neighbor);
+                    createdNodes++;
+                    if(neighbor.winState() && neighbor.getAStarValue()<bestPath){
+                        bestPath = neighbor.getAStarValue();
+                    }
+                    int overall = neighbor.getAStarValue();
+                    if(open.contains(neighbor) && neighbor.winState()){
+                        System.out.println("");
+                    }else{
+                        open.offer(neighbor);
+                    }
+
+                }
+            }
+
+            if(open.size() > maxFringe){
+                maxFringe = open.size();
+            }
+        }
+        current = goal;
+        ArrayList<PuzzleNode> path = new ArrayList<>();
+        while(current.getParent()!=null){
+            path.add(current);
+            current = current.getParent();
+        }
+        path.add(current);
+
+        Collections.reverse(path);
+
+//        for(int i = 0; i<path.size(); i++){
+//            System.out.println(i+1);
+//            System.out.println(path.get(i).checkState());
+//        }
+
+        System.out.println("PATH LENGTH: " + path.size());
+
+        return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ maxFringe;
+    }
+
+    //TODO update with stuff
+    /**
+     * Runs the AStar algorithm.
+     * @return A string with the results of the search algorithm
+     */
+    public String AStar1(int theHeuristic){
         PriorityQueue<PuzzleNode> fringe = new PriorityQueue<>();
         ArrayList<PuzzleNode> visited = new ArrayList<>();
         ArrayList<PuzzleNode> created = new ArrayList<>();
