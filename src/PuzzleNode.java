@@ -53,7 +53,7 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         if(theHeuristic == 3){
             myAStarValue = myMisplacedTiles + this.rowsOutOfPlace();
         } else if(theHeuristic == 4){
-            myAStarValue = myTotalMovesToWin + this.rowsOutOfPlace();
+            myAStarValue = myTotalMovesToWin + myMisplacedTiles;
         }
 
     }
@@ -419,8 +419,8 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         }
 
         if(myHeuristic == 4 && o.getHeuristic() == 4){
-            int first = myMisplacedTiles + myTotalMovesToWin;
-            int second = o.getMisplacedTiles() + o.getTotalMovesToWin();
+            int first = myAStarValue;
+            int second = o.getAStarValue();
             if(first > second){
                 compare = 1;
             }else if(first < second){

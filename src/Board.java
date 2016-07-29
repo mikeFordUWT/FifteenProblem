@@ -277,6 +277,9 @@ public class Board {
                         fringe.offer(moves.get(i));
                         current.addChild(moves.get(i));
                     }
+                }else if(created.contains(moves.get(i)) && moves.get(i).winState()){
+                    fringe.offer(moves.get(i));
+                    current.addChild(moves.get(i));
                 }
             }
 

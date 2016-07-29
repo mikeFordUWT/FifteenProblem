@@ -17,13 +17,14 @@ public class FifteenProblem {
         args = new String[3];
         args[0] = "12345678 ABC9DEF";
 //        args[0] = " FEDCBA987654321";
-//        args[0] = "1234678C5A B9DEF";
+        args[0] = "1234678C5A B9DEF";
+        args[0] = " 123456789ABCDEF";
 //        args[0] = "123456789ABCDEF ";
         args[1] = "AStar";
 //        args[1] = "GBFS";
-        args[1] = "DLS";
+//        args[1] = "DLS";
 //        args[2] = "h2";
-        args[2] = "14";
+        args[2] = "h2";
         Board myBoard;
 
 
