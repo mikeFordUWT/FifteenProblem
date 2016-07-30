@@ -236,53 +236,110 @@ public class Board {
      * @return A string with the results of the search algorithm
      */
     public String AStar(int theHeuristic){
+        /*
+            Data Structures
+         */
         PriorityQueue<PuzzleNode> open = new PriorityQueue<>();
         ArrayList<PuzzleNode> closed = new ArrayList<>();
+        HashMap<String, Integer> pathCosts = new HashMap<>();
 
+        //create the first node
         PuzzleNode root = new PuzzleNode(myBoard, 0, theHeuristic, null);
+        //add the node to map of costs
+        pathCosts.put(root.toString(), root.getPathCost());
+
+        //counter for amount of nodes
         int createdNodes = 1;
+
+        //A tree to build from the root node
         PuzzleTree tree = new PuzzleTree(root);
+
+        //place first node in the open Priority Queue
         open.offer(root);
 
+        //counter to track how big the fringe will get
         int maxFringe = open.size();
+
+        //A node used for back tracking.
         PuzzleNode goal = root;
+
+        //Counter to track the amount of nodes that are expanded
         int expanded = 0;
-        int row = 0;
-        int column =0;
+
+        //used to find the row and column of the blank tile
+        int row;
+        int column;
+
+        //boolean to keep the loop going
         boolean win = false;
-        PuzzleNode current = tree.getRoot();
-        int bestPath = Integer.MAX_VALUE;
+
+        //always updating the current node
+        PuzzleNode current;
+
+
         while(!win && !open.isEmpty()){
-            current = open.peek();
+//            Iterator<PuzzleNode> it = open.iterator();
+//            while(it.hasNext()){
+//                //
+//            }
+            //retrieve the head of the queue
+            current = open.poll();
+
+            //place the
+            pathCosts.put(current.toString(), current.getPathCost());
+
+            //Add current node to closed list
+            closed.add(current);
+
+            //update the row and column of blank tiles
+            row = current.getRow(BLANK);
+            column = current.getColumn(BLANK);
+
+            //Another node has been expanded
+            expanded++;
+
             if(current.winState()){
+                //so we can exit
                 win = true;
+                //so we can backtrack
                 goal = current;
             }
+
+            //increase the depth of the tree
             if(current.getDepth() > tree.getDepth()){
                 tree.setDepth(current.getDepth());
             }
-            open.remove(current);
-            closed.add(current);
-            row = current.getRow(BLANK);
-            column = current.getColumn(BLANK);
-            expanded++;
 
-
+            //Possible moves
             ArrayList<PuzzleNode> neighbors = movesWithH(current, row, column);
-            for(int i  = 0; i< neighbors.size(); i++){
-                PuzzleNode neighbor = neighbors.get(i);
 
+            //loop over those possible moves
+            for(int i  = 0; i< neighbors.size(); i++){
+                //the current possible move
+                PuzzleNode neighbor = neighbors.get(i);
+                //if the node hasn't been expanded
                 if(!closed.contains(neighbor)){
-                    current.addChild(neighbor);
-                    createdNodes++;
-                    if(neighbor.winState() && neighbor.getAStarValue()<bestPath){
-                        bestPath = neighbor.getAStarValue();
+                    int newPath = neighbor.getPathCost() + current.getPathCost();
+                    int oldPath = Integer.MIN_VALUE;//if neighbor not in hashMap, insures that
+                    if(open.contains(neighbor) && pathCosts.containsKey(neighbor.toString())){
+                        int times = 0;
+                        Iterator<PuzzleNode> it = open.iterator();
+                        while (it.hasNext()){
+                            if(it.equals(neighbor)){
+                                times++;
+                            }
+                        }
+//                        oldPath = pathCosts.get(neighbor.toString());
                     }
-                    int overall = neighbor.getAStarValue();
-                    if(open.contains(neighbor) && neighbor.winState()){
-                        System.out.println("");
-                    }else{
-                        open.offer(neighbor);
+                    //If new path to neighbor is shorter OR neighbor is not in open
+                    boolean inOpen = open.contains(neighbor);
+                    if (newPath < neighbor.getPathCost() || !inOpen){
+                        neighbor.setPathCost(newPath);
+                        pathCosts.put(neighbor.toString(), newPath);
+                        neighbor.setParent(current);
+                        if(!inOpen){
+                            open.add(neighbor);
+                        }
                     }
 
                 }
@@ -673,4 +730,6 @@ public class Board {
         return ns;
 
     }
+
+
 }

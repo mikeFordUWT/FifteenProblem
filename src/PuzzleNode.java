@@ -17,6 +17,7 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
     private int myMisplacedTiles;
     private int myTotalMovesToWin;
     private int myHeuristic;
+    private int myPathCost;
 
     private int myAStarValue;
 
@@ -50,10 +51,14 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         myMisplacedTiles = misplacedTiles();
         myTotalMovesToWin = movesToWin();
         myParent = theParent;
-        if(theHeuristic == 3){
-            myAStarValue = myMisplacedTiles + this.rowsOutOfPlace();
+        if(theHeuristic == 1){
+            myPathCost = myMisplacedTiles;
+        } else if(theHeuristic == 2){
+            myPathCost = myTotalMovesToWin;
+        } else if(theHeuristic == 3){
+            myPathCost = myMisplacedTiles + this.rowsOutOfPlace();
         } else if(theHeuristic == 4){
-            myAStarValue = myTotalMovesToWin + myMisplacedTiles;
+            myPathCost = myTotalMovesToWin + myMisplacedTiles;
         }
 
     }
@@ -271,6 +276,14 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
     public void setAStarValue(int theValue){
         myAStarValue = theValue;
     }
+
+    public int getPathCost(){
+        return myPathCost;
+    }
+
+    public void setPathCost(int newCost){
+        myPathCost = newCost;
+    }
     /**
      * Get the number of tiles out of place.
      *
@@ -384,52 +397,15 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
      */
     @Override
     public int compareTo(PuzzleNode o) {
-        int compare = 0;
-        if(myHeuristic == 1 && o.getHeuristic() == 1){//heuristic 1
-//            int compare = 0;
-            if(myMisplacedTiles > o.getMisplacedTiles()){
-                compare = 1;
-            } else if(myMisplacedTiles == o.getMisplacedTiles()){
-                compare = 0;
-            } else if(myMisplacedTiles < o.getMisplacedTiles()){
-                compare = -1;
-            }
+        int compare;
+
+        if(myPathCost > o.getPathCost()){
+            compare = 1;
+        } else if(myPathCost < o.getPathCost()){
+            compare = -1;
+        } else {
+            compare = 0;
         }
-
-        if(myHeuristic == 2 && o.getHeuristic() == 2){//heuristic 2
-//            int compare = 0;
-            if(myTotalMovesToWin > o.getTotalMovesToWin()){
-                compare = 1;
-            }else if(myTotalMovesToWin == o.getTotalMovesToWin()){
-                compare = 0;
-            } else if(myTotalMovesToWin < o.getTotalMovesToWin()){
-                compare = -1;
-            }
-
-        }
-
-        if((myHeuristic == 3 && o.getHeuristic() == 3)){//Heuristic 1 + tiles and rows
-            if(myAStarValue > o.getAStarValue()){
-                compare = 1;
-            }else if(myAStarValue == o.getAStarValue()){
-                compare = 0;
-            }else if(myAStarValue < o.getAStarValue()){
-                compare = -1;
-            }
-        }
-
-        if(myHeuristic == 4 && o.getHeuristic() == 4){
-            int first = myAStarValue;
-            int second = o.getAStarValue();
-            if(first > second){
-                compare = 1;
-            }else if(first < second){
-                compare = -1;
-            }else{
-                compare = 0;
-            }
-        }
-
         return compare;
     }
 }
