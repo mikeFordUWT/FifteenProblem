@@ -339,6 +339,9 @@ public class Board {
                         neighbor.setParent(current);
                         if(!inOpen){
                             open.add(neighbor);
+                        }else{
+                            open.remove(neighbor);
+                            open.offer(neighbor);
                         }
                     }
 

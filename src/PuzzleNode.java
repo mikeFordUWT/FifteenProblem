@@ -51,14 +51,16 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         myMisplacedTiles = misplacedTiles();
         myTotalMovesToWin = movesToWin();
         myParent = theParent;
-        if(theHeuristic == 1){
+
+        //Check which heuristic to use
+        if(theHeuristic == 1){//GBFS h1
             myPathCost = myMisplacedTiles;
-        } else if(theHeuristic == 2){
+        } else if(theHeuristic == 2){// GBFS h2
             myPathCost = myTotalMovesToWin;
         } else if(theHeuristic == 3){
             myPathCost = myMisplacedTiles + this.rowsOutOfPlace();
         } else if(theHeuristic == 4){
-            myPathCost = myTotalMovesToWin + myMisplacedTiles;
+            myPathCost = myTotalMovesToWin + this.rowsOutOfPlace();
         }
 
     }
