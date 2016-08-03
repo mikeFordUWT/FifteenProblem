@@ -329,11 +329,11 @@ public class Board {
                                 times++;
                             }
                         }
-//                        oldPath = pathCosts.get(neighbor.toString());
+                        oldPath = pathCosts.get(neighbor.toString());
                     }
                     //If new path to neighbor is shorter OR neighbor is not in open
                     boolean inOpen = open.contains(neighbor);
-                    if (newPath < neighbor.getPathCost() || !inOpen){
+                    if (newPath < oldPath || !inOpen){
                         neighbor.setPathCost(newPath);
                         pathCosts.put(neighbor.toString(), newPath);
                         neighbor.setParent(current);
@@ -362,10 +362,10 @@ public class Board {
 
         Collections.reverse(path);
 
-//        for(int i = 0; i<path.size(); i++){
-//            System.out.println(i+1);
-//            System.out.println(path.get(i).checkState());
-//        }
+        for(int i = 0; i<path.size(); i++){
+            System.out.println(i+1);
+            System.out.println(path.get(i).checkState());
+        }
 
         System.out.println("PATH LENGTH: " + path.size());
 
@@ -396,7 +396,7 @@ public class Board {
 
         boolean win = false;
         while(!win){
-            if(winState(current.toString())){
+            if(current.winState()){
                 win = true;
                 goal = current;
             }
@@ -462,7 +462,7 @@ public class Board {
         LinkedList<PuzzleNode> created = new LinkedList<>(); //store the string
         ArrayList<PuzzleNode> visited = new ArrayList<>();
 
-        PuzzleNode root = new PuzzleNode(myBoard, 0, null);
+        PuzzleNode root = new PuzzleNode(myBoard, 0, 0, null);
         PuzzleTree tree = new PuzzleTree(root);
         PuzzleNode current = root;
         created.add(current);
@@ -487,7 +487,7 @@ public class Board {
 
             tree.incrementExpanded();
             visited.add(current);
-            ArrayList<PuzzleNode> moves = movesNoH(current, row, column);
+            ArrayList<PuzzleNode> moves = movesWithH(current, row, column);
             for(int i = 0; i< moves.size(); i++){
                 if(!created.contains(moves.get(i))){
                     created.add(moves.get(i));
@@ -538,9 +538,9 @@ public class Board {
 
 
 
-    private Boolean winState(String stateToCheck){
-        return WIN_STATES.contains(stateToCheck);
-    }
+//    private Boolean winState(String stateToCheck){
+//        return WIN_STATES.contains(stateToCheck);
+//    }
 
     /*
     Helper method to figure out where the blank tile is.

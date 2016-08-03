@@ -21,12 +21,15 @@ public class FifteenProblem {
 //        args[0] = "12345687 BAC9DEF";
 //        args[0] = "12345678 ABC9DEF";
 //        args[0] = " 123456789ABCDEF";
-//        args[0] = "123456789ABCDEF ";
+        args[0] = "123 56749AB8DEFC";
+        args[0] = "16237 B45EA89DFC";
+//        args[0] = " 123456789ABCDEF";
         args[1] = "AStar";
 //        args[1] = "GBFS";
-//        args[1] = "DLS";
-        args[2] = "h1";
-//        args[2] = "15";
+//        args[1] = "BFS";
+        args[1] = "DLS";
+        args[2] = "h2";
+        args[2] = "12";
         Board myBoard;
 
 
@@ -114,7 +117,6 @@ public class FifteenProblem {
         }catch (NumberFormatException e){
             p = false;
         }
-
         return p;
     }
 }

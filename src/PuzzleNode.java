@@ -53,14 +53,16 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         myParent = theParent;
 
         //Check which heuristic to use
-        if(theHeuristic == 1){//GBFS h1
+        if(theHeuristic == 1){ //GBFS h1
             myPathCost = myMisplacedTiles;
-        } else if(theHeuristic == 2){// GBFS h2
+        } else if(theHeuristic == 2){ //GBFS h2
             myPathCost = myTotalMovesToWin;
-        } else if(theHeuristic == 3){
+        } else if(theHeuristic == 3){ //AStar h1
             myPathCost = myMisplacedTiles + this.rowsOutOfPlace();
-        } else if(theHeuristic == 4){
+        } else if(theHeuristic == 4){ //AStar h2
             myPathCost = myTotalMovesToWin + this.rowsOutOfPlace();
+        } else {
+            myPathCost = 0;
         }
 
     }
@@ -357,7 +359,7 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         return myKids.size() == 0;
     }
 
-    public int getRow( char tile){
+    public int getRow(char tile){
         for(int row = 0; row < myData.length; row++){
             for(int column = 0; column < myData.length; column++){
                 if(myData[row][column] == tile){
