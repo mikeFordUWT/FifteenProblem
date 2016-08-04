@@ -156,7 +156,99 @@ public class Board {
         return tree.getDepth() + " "+ created.size() + " " + tree.getExpanded() + " "+ fringeSize;
     }
 
+    /**
+     * A Depth Limited Search
+     *
+     * @param theDepth how deep can the tree go
+     * @return the information of the search if a result is found and -1 if goal not found
+     */
+    public String DLS(int theDepth){
+        String toReturn = "";
+        Stack<PuzzleNode> fringe = new Stack<>();
+        LinkedList<PuzzleNode> created = new LinkedList<>(); //store the string
+        ArrayList<PuzzleNode> visited = new ArrayList<>();
 
+        PuzzleNode root = new PuzzleNode(myBoard, 0, 0, null);
+        PuzzleTree tree = new PuzzleTree(root);
+        PuzzleNode current = root;
+        created.add(current);
+        PuzzleNode goal = current;
+        fringe.push(current);
+
+        int fringeSize = fringe.size();
+        int row = current.getRow(BLANK);
+        int column = current.getColumn(BLANK);
+        boolean win = false;
+        int bad = 0;
+        while(!win){
+            if(current.getDepth() > tree.getDepth()){
+                tree.setDepth(current.getDepth());
+            }
+
+            if(current.winState()){
+                win = true;
+                goal = current;
+            }
+
+
+            tree.incrementExpanded();
+            visited.add(current);
+            ArrayList<PuzzleNode> moves = movesWithH(current, row, column);
+            for(int i = 0; i< moves.size(); i++){
+                if(!created.contains(moves.get(i))){
+                    created.add(moves.get(i));
+                    if(!visited.contains(moves.get(i)) && moves.get(i).getDepth()<= theDepth){
+                        current.addChild(moves.get(i));
+                        fringe.push(moves.get(i));
+                    }
+                }
+            }
+
+            if(fringe.size() > fringeSize){
+                fringeSize = fringe.size();
+            }
+
+            if(fringe.isEmpty()){
+                bad = -1;
+                win = true;
+            }else{
+                current = fringe.pop();
+                row = current.getRow(BLANK);
+                column = current.getColumn(BLANK);
+            }
+        }
+
+        if(bad == -1){
+            toReturn = "-1";
+        }else{
+            current = goal;
+            ArrayList<PuzzleNode> path = new ArrayList<>();
+            while(current.getParent()!=null){
+                path.add(current);
+                current = current.getParent();
+            }
+            path.add(current);
+
+            Collections.reverse(path);
+
+            for(int i = 0; i<path.size(); i++){
+                System.out.println(i+1);
+                System.out.println(path.get(i).checkState());
+            }
+
+            System.out.println("PATH LENGTH: " + path.size());
+            toReturn = tree.getDepth() + " "+ created.size() + " " + tree.getExpanded() + " "+ fringeSize;
+        }
+        return toReturn;
+    }
+
+
+    /**
+     * A Greedy Best First Search
+     *
+     * @param theHeuristic the heuristic to use
+     * @return the results of the search
+     */
     public String GBFS(int theHeuristic){
         int heuristic = theHeuristic;
         ArrayList<PuzzleNode> created = new ArrayList<>();
@@ -235,7 +327,114 @@ public class Board {
      * Runs the AStar algorithm.
      * @return A string with the results of the search algorithm
      */
+
     public String AStar(int theHeuristic){
+        /*
+            Data Structures
+         */
+        PriorityQueue<PuzzleNode> open = new PriorityQueue<>();
+        ArrayList<PuzzleNode> closed = new ArrayList<>();
+        HashMap<String, Integer> pathCosts = new HashMap<>();
+
+        //create the first node
+        PuzzleNode root = new PuzzleNode(myBoard, 0, theHeuristic, null);
+        //add the node to map of costs
+        pathCosts.put(root.toString(), root.getPathCost());
+
+        //counter for amount of nodes
+        int createdNodes = 1;
+
+        //A tree to build from the root node
+        PuzzleTree tree = new PuzzleTree(root);
+
+        //place first node in the open Priority Queue
+        open.offer(root);
+
+        //counter to track how big the fringe will get
+        int maxFringe = open.size();
+
+        //A node used for back tracking.
+        PuzzleNode goal = root;
+
+        //Counter to track the amount of nodes that are expanded
+        int expanded = 0;
+
+        //used to find the row and column of the blank tile
+        int row;
+        int column;
+
+        //boolean to keep the loop going
+        boolean win = false;
+
+        //always updating the current node
+        PuzzleNode current;
+
+        while(!win && !open.isEmpty()){
+            current = open.poll();
+            expanded++;
+            closed.add(current);
+
+            row = current.getRow(BLANK);
+            column = current.getColumn(BLANK);
+
+            if(current.winState()){
+                win = true;
+                goal = current;
+            }
+            if(current.getDepth() > tree.getDepth()){
+                tree.setDepth(current.getDepth());
+            }
+
+            ArrayList<PuzzleNode> neighbors = movesWithH(current, row, column);
+            createdNodes += neighbors.size();
+
+            for(int i = 0; i < neighbors.size(); i++){
+                PuzzleNode neighbor = neighbors.get(i);
+                if(!closed.contains(neighbor)){
+                    int newPath = neighbor.getPathCost() + current.getPathCost();
+                    int oldPath = Integer.MIN_VALUE;
+                    if(pathCosts.containsKey(neighbor.toString())){
+                        oldPath = pathCosts.get(neighbor.toString());
+                    }
+
+                    boolean inOpen = open.contains(neighbor);
+
+                    if((newPath < oldPath) || !inOpen){
+                        neighbor.setPathCost(newPath);
+                        pathCosts.put(neighbor.toString(), newPath);
+                        neighbor.setParent(current);
+                        if(!inOpen){
+                            open.offer(neighbor);
+                        }else{
+                            boolean remove = open.remove(neighbor);
+                            open.offer(neighbor);
+                        }
+                    }
+                }
+            }
+
+            if(open.size() > maxFringe){
+                maxFringe = open.size();
+            }
+
+        }
+
+        current = goal;
+        ArrayList<PuzzleNode> path = new ArrayList<>();
+        while(current.getParent()!=null){
+            path.add(current);
+            current = current.getParent();
+        }
+        path.add(current);
+
+        Collections.reverse(path);
+
+        System.out.println("PATH LENGTH: " + path.size());
+
+        return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ maxFringe;
+    }
+
+    public String AStar2(int theHeuristic){
         /*
             Data Structures
          */
@@ -456,85 +655,7 @@ public class Board {
         return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
     }
 
-    public String DLS(int theDepth){
-        String toReturn = "";
-        Stack<PuzzleNode> fringe = new Stack<>();
-        LinkedList<PuzzleNode> created = new LinkedList<>(); //store the string
-        ArrayList<PuzzleNode> visited = new ArrayList<>();
 
-        PuzzleNode root = new PuzzleNode(myBoard, 0, 0, null);
-        PuzzleTree tree = new PuzzleTree(root);
-        PuzzleNode current = root;
-        created.add(current);
-        PuzzleNode goal = current;
-        fringe.push(current);
-
-        int fringeSize = fringe.size();
-        int row = current.getRow(BLANK);
-        int column = current.getColumn(BLANK);
-        boolean win = false;
-        int bad = 0;
-        while(!win){
-            if(current.getDepth() > tree.getDepth()){
-                tree.setDepth(current.getDepth());
-            }
-
-            if(current.winState()){
-                win = true;
-                goal = current;
-            }
-
-
-            tree.incrementExpanded();
-            visited.add(current);
-            ArrayList<PuzzleNode> moves = movesWithH(current, row, column);
-            for(int i = 0; i< moves.size(); i++){
-                if(!created.contains(moves.get(i))){
-                    created.add(moves.get(i));
-                    if(!visited.contains(moves.get(i)) && moves.get(i).getDepth()<= theDepth){
-                        current.addChild(moves.get(i));
-                        fringe.push(moves.get(i));
-                    }
-                }
-            }
-
-            if(fringe.size() > fringeSize){
-                fringeSize = fringe.size();
-            }
-
-            if(fringe.isEmpty()){
-                bad = -1;
-                win = true;
-            }else{
-                current = fringe.pop();
-                row = current.getRow(BLANK);
-                column = current.getColumn(BLANK);
-            }
-        }
-
-        if(bad == -1){
-            toReturn = "-1";
-        }else{
-            current = goal;
-            ArrayList<PuzzleNode> path = new ArrayList<>();
-            while(current.getParent()!=null){
-                path.add(current);
-                current = current.getParent();
-            }
-            path.add(current);
-
-            Collections.reverse(path);
-
-            for(int i = 0; i<path.size(); i++){
-                System.out.println(i+1);
-                System.out.println(path.get(i).checkState());
-            }
-
-            System.out.println("PATH LENGTH: " + path.size());
-            toReturn = tree.getDepth() + " "+ created.size() + " " + tree.getExpanded() + " "+ fringeSize;
-        }
-        return toReturn;
-    }
 
 
 

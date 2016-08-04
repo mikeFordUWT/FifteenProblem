@@ -13,6 +13,7 @@ public class FifteenProblem {
 
 
     public static void main (String[] args) {
+        long start = System.currentTimeMillis();
         /*For testing manual input because I'm lazy*/
         args = new String[3];
         args[0] = "12345678 ABC9DEF";
@@ -24,8 +25,11 @@ public class FifteenProblem {
         args[0] = "123 56749AB8DEFC";
         args[0] = "16237 B45EA89DFC";
 //        args[0] = " 123456789ABCDEF";
+        args[0] = "5164A38C92BF D7E";
+        args[0] = "123456789AB CDEF";
+        args[0] = " 123456789ABDEFC";
         args[1] = "AStar";
-//        args[1] = "GBFS";
+        args[1] = "GBFS";
 //        args[1] = "BFS";
 //        args[1] = "DLS";
         args[2] = "h2";
@@ -108,6 +112,10 @@ public class FifteenProblem {
 //            System.out.println("\nRESULTS:");
 //            System.out.println(myBoard.toString());
         }
+
+        long end = System.currentTimeMillis();
+
+        System.out.println((end-start)/10);
     }
 
     static boolean isParseable(String toParse){
