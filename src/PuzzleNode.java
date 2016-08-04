@@ -401,15 +401,6 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
      */
     @Override
     public int compareTo(PuzzleNode o) {
-        int compare;
-
-        if(myPathCost > o.getPathCost()){
-            compare = 1;
-        } else if(myPathCost < o.getPathCost()){
-            compare = -1;
-        } else {
-            compare = 0;
-        }
-        return compare;
+        return Integer.valueOf(myPathCost).compareTo(o.getPathCost());
     }
 }

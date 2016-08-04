@@ -27,9 +27,9 @@ public class FifteenProblem {
         args[1] = "AStar";
 //        args[1] = "GBFS";
 //        args[1] = "BFS";
-        args[1] = "DLS";
+//        args[1] = "DLS";
         args[2] = "h2";
-        args[2] = "12";
+//        args[2] = "12";
         Board myBoard;
 
 
