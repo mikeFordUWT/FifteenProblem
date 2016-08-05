@@ -16,18 +16,7 @@ public class FifteenProblem {
         long start = System.currentTimeMillis();
         /*For testing manual input because I'm lazy*/
         args = new String[3];
-        args[0] = "12345678 ABC9DEF";
-        args[0] = "1234 567ABC89DEF";
-//        args[0] = " FEDCBA987654321";
-//        args[0] = "12345687 BAC9DEF";
-//        args[0] = "12345678 ABC9DEF";
-//        args[0] = " 123456789ABCDEF";
-        args[0] = "123 56749AB8DEFC";
-        args[0] = "16237 B45EA89DFC";
-//        args[0] = " 123456789ABCDEF";
-        args[0] = "5164A38C92BF D7E";
-        args[0] = "123456789AB CDEF";
-        args[0] = " 123456789ABDEFC";
+        args[0] = "162453B7EA C9D8F";
         args[1] = "AStar";
         args[1] = "GBFS";
 //        args[1] = "BFS";

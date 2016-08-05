@@ -58,9 +58,9 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         } else if(theHeuristic == 2){ //GBFS h2
             myPathCost = myTotalMovesToWin;
         } else if(theHeuristic == 3){ //AStar h1
-            myPathCost = myMisplacedTiles + this.rowsOutOfPlace();
+            myPathCost = myMisplacedTiles + this.rowsColsOutOfPlace();
         } else if(theHeuristic == 4){ //AStar h2
-            myPathCost = myTotalMovesToWin + this.rowsOutOfPlace();
+            myPathCost = myTotalMovesToWin + this.rowsColsOutOfPlace();
         } else {
             myPathCost = 0;
         }
@@ -171,7 +171,7 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         int toReturn = 0;
         for(int i = 0; i < myData.length; i++){
             for(int j = 0; j < myData.length; j++){
-                if(myData[i][j] != win1[i][j] && myData[i][j] != win2[i][j]){
+                if(myData[i][j] != win1[i][j] || myData[i][j] != win2[i][j]){
                     toReturn++;
                 }
             }
@@ -181,25 +181,7 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
     }
 
     /*
-    A helper method that find the coordinates of a tile and returns them in an ArrayList.
-     */
-    private ArrayList<Integer> findTile(char theTile){
-        ArrayList<Integer> toReturn = new ArrayList<>();
-        for(int i = 0; i<myData.length; i++){
-            for(int j = 0; j< myData.length; j++){
-                if(myData[i][j] == theTile){
-                    toReturn.add(i);
-                    toReturn.add(j);
-                    break;
-                }
-            }
-        }
-
-        return toReturn;
-    }
-
-    /*
-    How many moves until the puzzle is in a win state.
+        How many moves until the puzzle is in a win state.
      */
     private int movesToWin(){
         int toReturn = 0;
@@ -234,15 +216,9 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
                     int colDiff = Math.abs(coords.get(tile).get(1) - column);
 
                     toReturn += rowDiff + colDiff;
-
                 }
-
             }
         }
-
-
-
-
         return toReturn;
     }
 
@@ -293,7 +269,7 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
      *
      * @return integer representing the tiles not in there proper row
      */
-    public int rowsOutOfPlace(){
+    public int rowsColsOutOfPlace(){
 
         char[][] win1 = {
                 {'1', '2', '3', '4'},
@@ -327,11 +303,9 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
 
                     if(rowDiff){count++;}
                     if(colDiff){count++;}
-
                 }
             }
         }
-
         return count;
     }
 
