@@ -58,10 +58,13 @@ public class Board {
         fringe.poll();
         int row = current.getRow(BLANK);
         int column = current.getColumn(BLANK);
+        int createdNodes = 1;
+        int expanded = 1;
 
 
         boolean win = false;
         while(!win){//until a win state is found
+
             if(current.winState()){
                 win = true;
             }
@@ -69,7 +72,7 @@ public class Board {
             if(current.getDepth()>tree.getDepth()){
                 tree.setDepth(current.getDepth());
             }
-            tree.incrementExpanded();
+            expanded++;
             visited.add(current);
 
             ArrayList<PuzzleNode> moves = movesNoH(current, row, column);
@@ -79,6 +82,7 @@ public class Board {
                     if(!visited.contains(moves.get(i))){
                         current.addChild(moves.get(i));
                         fringe.offer(moves.get(i));
+                        createdNodes++;
                     }
                 }
             }
@@ -93,7 +97,7 @@ public class Board {
                 column = current.getColumn(BLANK);
             }
         }
-        return tree.getDepth() + " "+ created.size() + " " + tree.getExpanded() + " "+ fringeSize;
+        return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
     }
 
     //TODO
@@ -115,12 +119,16 @@ public class Board {
         fringe.push(current);
         int fringeSize = fringe.size();
         fringe.pop();
+        int createdNodes = 1;
+        int expanded = 1;
         int row = current.getRow(BLANK);
         int column = current.getColumn(BLANK);
         boolean win = false;
         while(!win){
             if(current.winState()){
                 win = true;
+            }else{
+                expanded++;
             }
 
             if(current.getDepth() > tree.getDepth()){
@@ -137,6 +145,7 @@ public class Board {
                     if(!visited.contains(moves.get(i))){
                         current.addChild(moves.get(i));
                         fringe.push(moves.get(i));
+                        createdNodes++;
                     }
                 }
             }
@@ -180,26 +189,33 @@ public class Board {
         int column = current.getColumn(BLANK);
         boolean win = false;
         int bad = 0;
+        int expanded = 0;
+        int createdNodes = 1;
         while(!win){
-            if(current.getDepth() > tree.getDepth()){
-                tree.setDepth(current.getDepth());
-            }
+
 
             if(current.winState()){
                 win = true;
                 goal = current;
+            }else{
+                expanded++;
             }
 
+            if(current.getDepth() > tree.getDepth()){
+                tree.setDepth(current.getDepth());
+            }
 
-            tree.incrementExpanded();
             visited.add(current);
             ArrayList<PuzzleNode> moves = movesWithH(current, row, column);
+
+            createdNodes += moves.size();
             for(int i = 0; i< moves.size(); i++){
                 if(!created.contains(moves.get(i))){
                     created.add(moves.get(i));
                     if(!visited.contains(moves.get(i)) && moves.get(i).getDepth()<= theDepth){
                         current.addChild(moves.get(i));
                         fringe.push(moves.get(i));
+                        createdNodes++;
                     }
                 }
             }
@@ -237,7 +253,7 @@ public class Board {
             }
 
             System.out.println("PATH LENGTH: " + path.size());
-            toReturn = tree.getDepth() + " "+ created.size() + " " + tree.getExpanded() + " "+ fringeSize;
+            toReturn = tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
         }
         return toReturn;
     }
@@ -268,10 +284,11 @@ public class Board {
         int column = current.getColumn(BLANK);
         boolean win = false;
         while(!win){
-            expanded++;
             if(current.winState()){
                 win = true;
                 goal = current;
+            }else{
+                expanded++;
             }
 
             if(current.getDepth() > tree.getDepth()){
@@ -282,7 +299,9 @@ public class Board {
             visited.add(current);
 
             ArrayList<PuzzleNode> moves = movesWithH(current, row, column);
-            createdNodes += moves.size();
+            if(!win){
+                createdNodes += moves.size();
+            }
 
             for(int i = 0; i < moves.size(); i++){
                 if(!visited.contains(moves.get(i))){
@@ -371,7 +390,6 @@ public class Board {
 
         while(!win && !open.isEmpty()){
             current = open.poll();
-            expanded++;
             closed.add(current);
 
             row = current.getRow(BLANK);
@@ -380,13 +398,18 @@ public class Board {
             if(current.winState()){
                 win = true;
                 goal = current;
+            }else{
+                expanded++;
             }
             if(current.getDepth() > tree.getDepth()){
                 tree.setDepth(current.getDepth());
             }
 
             ArrayList<PuzzleNode> neighbors = movesWithH(current, row, column);
-            createdNodes += neighbors.size();
+            if(!win){
+                createdNodes += neighbors.size();
+            }
+
 
             for(int i = 0; i < neighbors.size(); i++){
                 PuzzleNode neighbor = neighbors.get(i);
@@ -434,234 +457,6 @@ public class Board {
         return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ maxFringe;
     }
 
-    public String AStar2(int theHeuristic){
-        /*
-            Data Structures
-         */
-        PriorityQueue<PuzzleNode> open = new PriorityQueue<>();
-        ArrayList<PuzzleNode> closed = new ArrayList<>();
-        HashMap<String, Integer> pathCosts = new HashMap<>();
-
-        //create the first node
-        PuzzleNode root = new PuzzleNode(myBoard, 0, theHeuristic, null);
-        //add the node to map of costs
-        pathCosts.put(root.toString(), root.getPathCost());
-
-        //counter for amount of nodes
-        int createdNodes = 1;
-
-        //A tree to build from the root node
-        PuzzleTree tree = new PuzzleTree(root);
-
-        //place first node in the open Priority Queue
-        open.offer(root);
-
-        //counter to track how big the fringe will get
-        int maxFringe = open.size();
-
-        //A node used for back tracking.
-        PuzzleNode goal = root;
-
-        //Counter to track the amount of nodes that are expanded
-        int expanded = 0;
-
-        //used to find the row and column of the blank tile
-        int row;
-        int column;
-
-        //boolean to keep the loop going
-        boolean win = false;
-
-        //always updating the current node
-        PuzzleNode current;
-
-
-        while(!win && !open.isEmpty()){
-//            Iterator<PuzzleNode> it = open.iterator();
-//            while(it.hasNext()){
-//                //
-//            }
-            //retrieve the head of the queue
-            current = open.poll();
-
-            //place the
-            pathCosts.put(current.toString(), current.getPathCost());
-
-            //Add current node to closed list
-            closed.add(current);
-
-            //update the row and column of blank tiles
-            row = current.getRow(BLANK);
-            column = current.getColumn(BLANK);
-
-            //Another node has been expanded
-            expanded++;
-
-            if(current.winState()){
-                //so we can exit
-                win = true;
-                //so we can backtrack
-                goal = current;
-            }
-
-            //increase the depth of the tree
-            if(current.getDepth() > tree.getDepth()){
-                tree.setDepth(current.getDepth());
-            }
-
-            //Possible moves
-            ArrayList<PuzzleNode> neighbors = movesWithH(current, row, column);
-
-            //loop over those possible moves
-            for(int i  = 0; i< neighbors.size(); i++){
-                //the current possible move
-                PuzzleNode neighbor = neighbors.get(i);
-                //if the node hasn't been expanded
-                if(!closed.contains(neighbor)){
-                    int newPath = neighbor.getPathCost() + current.getPathCost();
-                    int oldPath = Integer.MIN_VALUE;//if neighbor not in hashMap, insures that
-                    if(open.contains(neighbor) && pathCosts.containsKey(neighbor.toString())){
-                        int times = 0;
-                        Iterator<PuzzleNode> it = open.iterator();
-                        while (it.hasNext()){
-                            if(it.equals(neighbor)){
-                                times++;
-                            }
-                        }
-                        oldPath = pathCosts.get(neighbor.toString());
-                    }
-                    //If new path to neighbor is shorter OR neighbor is not in open
-                    boolean inOpen = open.contains(neighbor);
-                    if (newPath < oldPath || !inOpen){
-                        neighbor.setPathCost(newPath);
-                        pathCosts.put(neighbor.toString(), newPath);
-                        neighbor.setParent(current);
-                        if(!inOpen){
-                            open.add(neighbor);
-                        }else{
-                            open.remove(neighbor);
-                            open.offer(neighbor);
-                        }
-                    }
-
-                }
-            }
-
-            if(open.size() > maxFringe){
-                maxFringe = open.size();
-            }
-        }
-        current = goal;
-        ArrayList<PuzzleNode> path = new ArrayList<>();
-        while(current.getParent()!=null){
-            path.add(current);
-            current = current.getParent();
-        }
-        path.add(current);
-
-        Collections.reverse(path);
-
-        for(int i = 0; i<path.size(); i++){
-            System.out.println(i+1);
-            System.out.println(path.get(i).checkState());
-        }
-
-        System.out.println("PATH LENGTH: " + path.size());
-
-        return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ maxFringe;
-    }
-
-    //TODO update with stuff
-    /**
-     * Runs the AStar algorithm.
-     * @return A string with the results of the search algorithm
-     */
-    public String AStar1(int theHeuristic){
-        PriorityQueue<PuzzleNode> fringe = new PriorityQueue<>();
-        ArrayList<PuzzleNode> visited = new ArrayList<>();
-        ArrayList<PuzzleNode> created = new ArrayList<>();
-
-        PuzzleNode root = new PuzzleNode(myBoard, 0, theHeuristic, null);
-        int createdNodes = 1;
-        PuzzleTree tree = new PuzzleTree(root);
-        fringe.offer(root);
-        int fringeSize = fringe.size();
-
-        PuzzleNode current = fringe.poll();
-        PuzzleNode goal = current;
-        int expanded = 0;
-        int row = current.getRow(BLANK);
-        int column = current.getColumn(BLANK);
-
-        boolean win = false;
-        while(!win){
-            if(current.winState()){
-                win = true;
-                goal = current;
-            }
-            expanded++;
-
-            if(current.getDepth() > tree.getDepth()){
-                tree.setDepth(current.getDepth());
-            }
-
-            tree.incrementExpanded();
-            visited.add(current);
-
-            ArrayList<PuzzleNode> moves = movesWithH(current, row, column);
-            createdNodes += moves.size();
-
-            for(int i = 0; i< moves.size(); i++){
-                if(!created.contains(moves.get(i))){
-                    created.add(moves.get(i));
-                    if(!visited.contains(moves.get(i))){
-                        fringe.offer(moves.get(i));
-                        current.addChild(moves.get(i));
-                    }
-                }else if(created.contains(moves.get(i)) && moves.get(i).winState()){
-                    fringe.offer(moves.get(i));
-                    current.addChild(moves.get(i));
-                }
-            }
-
-            if(fringe.size() > fringeSize){ fringeSize = fringe.size();}
-
-            if(!fringe.isEmpty()){
-                current = fringe.poll();
-                row = current.getRow(BLANK);
-                column = current.getColumn(BLANK);
-            }else{
-                System.out.println("EMPT!!!!!");
-            }
-        }
-
-        //Prints out the solution path and the size of the path
-        current = goal;
-        ArrayList<PuzzleNode> path = new ArrayList<>();
-        while(current.getParent()!=null){
-            path.add(current);
-            current = current.getParent();
-        }
-        path.add(current);
-
-        Collections.reverse(path);
-
-        for(int i = 0; i<path.size(); i++){
-            System.out.println(i+1);
-            System.out.println(path.get(i).checkState());
-        }
-
-        System.out.println("PATH LENGTH: " + path.size());
-        return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
-    }
-
-
-
-
-
-//    private Boolean winState(String stateToCheck){
-//        return WIN_STATES.contains(stateToCheck);
-//    }
 
     /*
     Helper method to figure out where the blank tile is.
