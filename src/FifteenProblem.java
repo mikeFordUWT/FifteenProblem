@@ -58,13 +58,10 @@ public class FifteenProblem {
                 }
 
             } else if(args[1].toUpperCase().equals("GBFS")){ // GREEDY BEST-FIRST
-                int heuristic;
                 if(args[2] != null && args[2].equals("h1")){
-                    heuristic = 1;
                     myBoard = new Board(toUp);
                     System.out.println(myBoard.GBFS(1));
                 } else if(args[2] != null && args[2].equals("h2")){
-                    heuristic = 2;
                     myBoard = new Board(toUp);
                     System.out.println(myBoard.GBFS(2));
 
@@ -74,26 +71,21 @@ public class FifteenProblem {
 
             } else if(args[1].toUpperCase().equals("ASTAR")){ //A*
                 if(args[2] != null && args[2].equals("h1")){
-                    int heuristic = 3;
                     myBoard = new Board(toUp);
-                    System.out.println(myBoard.AStar(heuristic));
+                    System.out.println(myBoard.AStar(3));
                 } else if(args[2] != null && args[2].equals("h2")){
-                    int heuristic = 4;
                     myBoard = new Board(toUp);
-                    System.out.println(myBoard.AStar(heuristic));
+                    System.out.println(myBoard.AStar(4));
                 } else {
                     System.out.println("AStar only takes two heuristics: h1 AND h2");
                 }
 
             }
-//
-//            System.out.println("\nRESULTS:");
-//            System.out.println(myBoard.toString());
         }
 
         long end = System.currentTimeMillis();
 
-        System.out.println((end-start)/10);
+        System.out.println((end-start) + " ms");
     }
 
     static boolean isParseable(String toParse){

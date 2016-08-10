@@ -6,8 +6,6 @@ import java.util.*;
  */
 public class Board {
     private final char BLANK = ' ';
-    private final ArrayList<String> WIN_STATES =
-            new ArrayList<>(Arrays.asList("123456789ABCDEF ", "123456789ABCDFE "));
     private char[][] myBoard;
 
     /**
@@ -24,9 +22,6 @@ public class Board {
                 k++;
             }
         }
-        PuzzleNode check = new PuzzleNode(myBoard, 0, null);
-//        System.out.println(check.checkState());
-
     }
 
 //    /**
@@ -92,13 +87,24 @@ public class Board {
                 fringeSize = fringe.size();
             }
 
-            if(!fringe.isEmpty()){
+            if(!fringe.isEmpty() && !win){
                 current = fringe.poll();
                 row = current.getRow(BLANK);
                 column = current.getColumn(BLANK);
             }
         }
-        return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
+        PuzzleNode pathNode = current;
+        ArrayList<PuzzleNode> path = new ArrayList<>();
+        while(pathNode.getParent() != null){
+            path.add(pathNode);
+            pathNode = pathNode.getParent();
+        }
+
+        path.add(pathNode);
+
+
+
+        return "PATH LENGTH: " + path.size()+"\n" + tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
     }
 
     //TODO
@@ -246,12 +252,12 @@ public class Board {
             }
             path.add(current);
 
-            Collections.reverse(path);
-
-            for(int i = 0; i<path.size(); i++){
-                System.out.println(i+1);
-                System.out.println(path.get(i).checkState());
-            }
+//            Collections.reverse(path);
+//
+//            for(int i = 0; i<path.size(); i++){
+//                System.out.println(i+1);
+//                System.out.println(path.get(i).checkState());
+//            }
 
             System.out.println("PATH LENGTH: " + path.size());
 
@@ -321,8 +327,6 @@ public class Board {
                 current = fringe.poll();
                 row = current.getRow(BLANK);
                 column = current.getColumn(BLANK);
-            }else{
-                System.out.println("EMPT!!!!!");
             }
         }
 
@@ -336,10 +340,10 @@ public class Board {
 
         Collections.reverse(path);
 
-        for(int i = 0; i<path.size(); i++){
-            System.out.println(i+1);
-            System.out.println(path.get(i).checkState());
-        }
+//        for(int i = 0; i<path.size(); i++){
+//            System.out.println(i+1);
+//            System.out.println(path.get(i).checkState());
+//        }
         System.out.println("PATH LENGTH: " + path.size());
         return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
     }
@@ -615,6 +619,9 @@ public class Board {
         return -1;
     }
 
+    /*
+        Helper method that find the moves of a node that has a heuristic
+     */
     private ArrayList<PuzzleNode> movesWithH(PuzzleNode current, int i, int j){
 
         ArrayList<PuzzleNode> ns = new ArrayList<>();
