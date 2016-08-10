@@ -14,15 +14,6 @@ public class FifteenProblem {
 
     public static void main (String[] args) {
         long start = System.currentTimeMillis();
-        /*For testing manual input because I'm lazy*/
-//        args = new String[3];
-//        args[0] = "162453B7EA C9D8F";
-//        args[1] = "AStar";
-//        args[1] = "GBFS";
-////        args[1] = "BFS";
-////        args[1] = "DLS";
-//        args[2] = "h2";
-//        args[2] = "12";
         Board myBoard;
 
 

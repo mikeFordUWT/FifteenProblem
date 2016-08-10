@@ -29,14 +29,14 @@ public class Board {
 
     }
 
-    /**
-     * Get the state of the board.
-     *
-     * @return 2D Array of the board state
-     */
-    public char[][] getMyBoard() {
-        return myBoard;
-    }
+//    /**
+//     * Get the state of the board.
+//     *
+//     * @return 2D Array of the board state
+//     */
+//    public char[][] getMyBoard() {
+//        return myBoard;
+//    }
 
 
     /**
@@ -72,6 +72,7 @@ public class Board {
             if(current.getDepth()>tree.getDepth()){
                 tree.setDepth(current.getDepth());
             }
+
             expanded++;
             visited.add(current);
 
@@ -135,7 +136,7 @@ public class Board {
                 tree.setDepth(current.getDepth());
             }
 
-            tree.incrementExpanded();
+            expanded++;
             visited.add(current);
 
             ArrayList<PuzzleNode> moves = movesNoH(current, row, column);
@@ -162,7 +163,7 @@ public class Board {
         }
 
 
-        return tree.getDepth() + " "+ created.size() + " " + tree.getExpanded() + " "+ fringeSize;
+        return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
     }
 
     /**
@@ -253,6 +254,7 @@ public class Board {
             }
 
             System.out.println("PATH LENGTH: " + path.size());
+
             toReturn = tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
         }
         return toReturn;
