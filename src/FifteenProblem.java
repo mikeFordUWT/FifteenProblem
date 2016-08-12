@@ -41,51 +41,58 @@ public class FifteenProblem {
             }
 
 
-            if(args[1].toUpperCase().equals("BFS")){ //BREADTH FIRST
+            if(args[1].toUpperCase().equals("BFS") && args.length == 2){ //BREADTH FIRST
                 myBoard = new Board(toUp);
                 System.out.println(myBoard.BFS());
-            } else if(args[1].toUpperCase().equals("DFS")){ //DEPTH FIRST
+            } else if(args[1].toUpperCase().equals("DFS") && args.length == 2){ //DEPTH FIRST
                 myBoard = new Board(toUp);
                 System.out.println(myBoard.DFS());
-            } else if(args[1].toUpperCase().equals("DLS")){ //DEPTH LIMITED
+            } else if(args[1].toUpperCase().equals("DLS") && args.length == 3){ //DEPTH LIMITED
                 boolean parse = isParseable(args[2]);
                 if(parse){
                     myBoard = new Board(toUp);
                     int arg = Integer.parseInt(args[2]);
-                    System.out.println(myBoard.DLS(arg));
+                    System.out.println(myBoard.DLS(arg)+ "\n");
                 }else{
                     System.out.println("The second argument is not an Integer");
                 }
 
-            } else if(args[1].toUpperCase().equals("GBFS")){ // GREEDY BEST-FIRST
+            } else if(args[1].toUpperCase().equals("GBFS") && args.length == 3){ // GREEDY BEST-FIRST
                 if(args[2] != null && args[2].equals("h1")){
                     myBoard = new Board(toUp);
-                    System.out.println(myBoard.GBFS(1));
+                    System.out.println(myBoard.GBFS(1)+ "\n");
                 } else if(args[2] != null && args[2].equals("h2")){
                     myBoard = new Board(toUp);
-                    System.out.println(myBoard.GBFS(2));
+                    System.out.println(myBoard.GBFS(2)+ "\n");
 
-                } else {
+                }else if(args[2] == null){
+                    System.out.println("NOT ENOUGH ARGUMENTS\nARGS: [\"initialstate\"] [searchmethod] [options]");
+                }
+                else {
                     System.out.println("GBFS only takes two heuristics: h1 AND h2");
                 }
 
-            } else if(args[1].toUpperCase().equals("ASTAR")){ //A*
+            } else if(args[1].toUpperCase().equals("ASTAR") && args.length == 3){ //A*
                 if(args[2] != null && args[2].equals("h1")){
                     myBoard = new Board(toUp);
-                    System.out.println(myBoard.AStar(3));
+                    System.out.println(myBoard.AStar(3)+ "\n");
                 } else if(args[2] != null && args[2].equals("h2")){
                     myBoard = new Board(toUp);
-                    System.out.println(myBoard.AStar(4));
+                    System.out.println(myBoard.AStar(4) + "\n");
+                } else if(args[2] == null){
+                    System.out.println("NOT ENOUGH ARGUMENTS\nARGS: [\"initialstate\"] [searchmethod] [options]");
                 } else {
                     System.out.println("AStar only takes two heuristics: h1 AND h2");
                 }
 
+            }else{
+                System.out.println("\nNOT ENOUGH ARGUMENTS\nARGS: [\"initialstate\"] [searchmethod] [options]\n");
             }
         }
 
         long end = System.currentTimeMillis();
 
-        System.out.println((end-start) + " ms");
+        System.out.println((end-start) + " ms" + "\n");
     }
 
     static boolean isParseable(String toParse){
