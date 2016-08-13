@@ -1,9 +1,14 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
  * A PuzzleNode class that implement comparable for use in a PuzzleTree for a tile puzzle.
+ *
+ * @author Michael Ford
+ * TCSS 435
+ * Summer 2016
  */
 public class PuzzleNode implements Comparable<PuzzleNode>{
     private final char BLANK = ' ';
@@ -223,38 +228,11 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
     }
 
     /**
-     * Get the amount of misplaced tiles.
-     *
-     * @return Integer of the misplaced tiles
-     */
-    public int getMisplacedTiles(){
-        return  myMisplacedTiles;
-    }
-
-    /**
-     * Getter for how many moves total to a win state
-     *
-     * @return total moves away from win
-     */
-    public int getTotalMovesToWin(){
-        return myTotalMovesToWin;
-    }
-
-    /**
      * Checks if a node is in a win state or not.
      * @return true if in win state or false if not in win state
      */
     public boolean winState(){
         return WIN_STATES.contains(this.toString());
-    }
-
-
-    public int getAStarValue(){
-        return myAStarValue;
-    }
-
-    public void setAStarValue(int theValue){
-        myAStarValue = theValue;
     }
 
     public int getPathCost(){
@@ -345,7 +323,11 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
         return -1;
     }
 
-
+    /**
+     * Get the column of where a tile is in the Puzzle
+     * @param tile the char that is sought
+     * @return the int representation of the column
+     */
     public int getColumn(char tile){
         for(int row = 0; row < myData.length; row++){
             for(int column = 0; column < myData.length; column++){
@@ -359,12 +341,32 @@ public class PuzzleNode implements Comparable<PuzzleNode>{
     }
 
     /**
+     * Retrieve the path from the root to the goal state.
+     * @return a list in the order from root to goal
+     */
+    public ArrayList<PuzzleNode> findPathFromGoal(){
+        ArrayList<PuzzleNode> path = new ArrayList<>();
+        PuzzleNode current = new PuzzleNode(myData, myDepth, myParent);
+        path.add(current);
+        while(current.getParent() != null){
+            current = current.getParent();
+            path.add(current);
+        }
+        Collections.reverse(path);
+        return path;
+    }
+
+    /**
      * A method that checks equality of nodes by checking their toStrings
      * @return true if the two nodes are equal
      */
     @Override
     public boolean equals(Object theOther){
-        return this.toString().equals(theOther.toString());
+        if(theOther instanceof PuzzleNode){
+            return this.toString().equals(theOther.toString());
+        } else{
+            return false;
+        }
     }
 
     /**

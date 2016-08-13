@@ -1,25 +1,16 @@
 import java.util.*;
 
 /**
- * Created by Mike on 7/6/16.
+ * A Tree data structure for use with PuzzleNodes
+ *
+ * @author Michael Ford
+ * TCSS 435
+ * Summer 2016
  */
 public class PuzzleTree {
     private int myDepth;
-    private int myExpanded;
-    private int myCreatedNodes;
     private PuzzleNode myRootNode;
     ArrayList<PuzzleNode> created;
-
-    /**
-     * Unparameterized PuzzleTree constructor.
-     */
-    public PuzzleTree(){
-        myDepth = 0;
-        myExpanded = 0;
-        myCreatedNodes = 0;
-        created = new ArrayList<>();
-        myRootNode = null;
-    }
 
     /**
      * Parameterized constructor.
@@ -29,8 +20,6 @@ public class PuzzleTree {
     public PuzzleTree(PuzzleNode theRootNode){
         myRootNode = theRootNode;
         myDepth = 0;
-        myExpanded = 0;
-        myCreatedNodes = 1;
         created = new ArrayList<>();
     }
 
@@ -68,29 +57,6 @@ public class PuzzleTree {
      */
     public void setDepth(int theDepth) {
         myDepth = theDepth;
-    }
-
-    public int getExpanded() {
-        return myExpanded;
-    }
-
-    public void incrementExpanded(){
-        myExpanded++;
-    }
-
-    /**
-     * Retrieve the amount of nodes in the tree
-     * @return
-     */
-    public int getCreated() {
-        return myCreatedNodes;
-    }
-
-    /**
-     * Increment the amount of nodes created in the tree.
-     */
-    public void incrementCreated(){
-        myCreatedNodes++;
     }
 
     /**
