@@ -2,7 +2,11 @@
 import java.util.*;
 
 /**
- * Created by Mike on 7/6/16.
+ * Board class that handles all algorithms.
+ *
+ * @author Michael Ford
+ * TCSS 435
+ * Summer 2016
  */
 public class Board {
     private final char BLANK = ' ';
@@ -23,16 +27,6 @@ public class Board {
             }
         }
     }
-
-//    /**
-//     * Get the state of the board.
-//     *
-//     * @return 2D Array of the board state
-//     */
-//    public char[][] getMyBoard() {
-//        return myBoard;
-//    }
-
 
     /**
      * Runs a Breadth First Search of the Tree.
@@ -94,13 +88,12 @@ public class Board {
             }
         }
         PuzzleNode pathNode = current;
-        ArrayList<PuzzleNode> path = new ArrayList<>();
-        while(pathNode.getParent() != null){
-            path.add(pathNode);
-            pathNode = pathNode.getParent();
-        }
-
-        path.add(pathNode);
+        ArrayList<PuzzleNode> path = current.findPathFromGoal();
+        //uncomment for printing out path
+//        for(int i = 0; i<path.size(); i++){
+//            System.out.println(i+1);
+//            System.out.println(path.get(i).checkState());
+//        }
 
 
 
@@ -179,7 +172,7 @@ public class Board {
      * @return the information of the search if a result is found and -1 if goal not found
      */
     public String DLS(int theDepth){
-        String toReturn = "";
+        String toReturn;
         Stack<PuzzleNode> fringe = new Stack<>();
         LinkedList<PuzzleNode> created = new LinkedList<>(); //store the string
         ArrayList<PuzzleNode> visited = new ArrayList<>();
@@ -199,8 +192,6 @@ public class Board {
         int expanded = 0;
         int createdNodes = 1;
         while(!win){
-
-
             if(current.winState()){
                 win = true;
                 goal = current;
@@ -245,19 +236,12 @@ public class Board {
             toReturn = "-1";
         }else{
             current = goal;
-            ArrayList<PuzzleNode> path = new ArrayList<>();
-            while(current.getParent()!=null){
-                path.add(current);
-                current = current.getParent();
-            }
-            path.add(current);
-
-//            Collections.reverse(path);
-//
-//            for(int i = 0; i<path.size(); i++){
-//                System.out.println(i+1);
-//                System.out.println(path.get(i).checkState());
-//            }
+            ArrayList<PuzzleNode> path = current.findPathFromGoal();
+            //uncomment for printing out path
+//        for(int i = 0; i<path.size(); i++){
+//            System.out.println(i+1);
+//            System.out.println(path.get(i).checkState());
+//        }
 
             System.out.println("PATH LENGTH: " + path.size());
 
@@ -303,7 +287,6 @@ public class Board {
                 tree.setDepth(current.getDepth());
             }
 
-            tree.incrementExpanded();
             visited.add(current);
 
             ArrayList<PuzzleNode> moves = movesWithH(current, row, column);
@@ -331,15 +314,8 @@ public class Board {
         }
 
         current = goal;
-        ArrayList<PuzzleNode> path = new ArrayList<>();
-        while(current.getParent()!=null){
-            path.add(current);
-            current = current.getParent();
-        }
-        path.add(current);
-
-        Collections.reverse(path);
-
+        ArrayList<PuzzleNode> path = current.findPathFromGoal();
+        //uncomment for printing out path
 //        for(int i = 0; i<path.size(); i++){
 //            System.out.println(i+1);
 //            System.out.println(path.get(i).checkState());
@@ -449,14 +425,12 @@ public class Board {
         }
 
         current = goal;
-        ArrayList<PuzzleNode> path = new ArrayList<>();
-        while(current.getParent()!=null){
-            path.add(current);
-            current = current.getParent();
-        }
-        path.add(current);
-
-        Collections.reverse(path);
+        ArrayList<PuzzleNode> path = current.findPathFromGoal();
+        //uncomment for printing out path
+//        for(int i = 0; i<path.size(); i++){
+//            System.out.println(i+1);
+//            System.out.println(path.get(i).checkState());
+//        }
 
         System.out.println("PATH LENGTH: " + path.size());
 
@@ -480,7 +454,6 @@ public class Board {
                 }
             }
         }
-
         return cooridinates;
     }
 
@@ -591,7 +564,6 @@ public class Board {
             PuzzleNode up = new PuzzleNode(moveUp(data), current.getDepth() + 1, current);
             ns.add(up);
         }
-
         return ns;
     }
 
@@ -603,7 +575,6 @@ public class Board {
                 }
             }
         }
-
         return -1;
     }
 
@@ -615,7 +586,6 @@ public class Board {
                 }
             }
         }
-
         return -1;
     }
 
@@ -654,10 +624,6 @@ public class Board {
             up.setParent(current);
             ns.add(up);
         }
-
         return ns;
-
     }
-
-
 }

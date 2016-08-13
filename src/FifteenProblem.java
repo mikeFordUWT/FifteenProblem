@@ -3,12 +3,16 @@ import java.util.Arrays;
 import java.util.Base64;
 
 /**
- * Created by Mike on 7/6/16.
+ * FifteenProblem class that runs the whole show!
+ *
+ * @author Michael Ford
+ * TCSS 435
+ * Summer 2016
  */
 public class FifteenProblem {
-    final static ArrayList<Character> LETTERS =
+    private final static ArrayList<Character> LETTERS =
             new ArrayList<>(Arrays.asList('1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', ' '));
-    final static ArrayList<String> SEARCHES =
+    private final static ArrayList<String> SEARCHES =
             new ArrayList<>(Arrays.asList("BFS", "DFS", "GBFS", "ASTAR", "DLS"));
 
 
