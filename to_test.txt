@@ -1,11 +1,56 @@
 TO TEST
 
-java FifteenProblem "234 16785ABC9DEF" DLS 9
-java FifteenProblem "234 16785ABC9DEF" BFS
-java FifteenProblem "234 16785ABC9DEF" AStar h2
-java FifteenProblem "234 16785ABC9DEF" AStar h1
-java FifteenProblem "234 16785ABC9DEF" GBFS h1
-java FifteenProblem "234 16785ABC9DEF" GBFS h2
+[1,2,3,4]
+[5,6,7,8]
+[ ,A,B,C]
+[9,D,E,F]
+java FifteenProblem "12345678 ABC9DEF" DLS 11
+-1
 
-ASTAR h2
-9 92 28 37
+6978 ms
+
+java FifteenProblem "12345678 ABC9DEF" DLS 12
+PATH LENGTH: 5
+12 18467 4457 19
+
+13172 ms
+
+java FifteenProblem "12345678 ABC9DEF" BFS
+PATH LENGTH: 5
+4 89 43 47
+18 ms
+
+java FifteenProblem "12345678 ABC9DEF" DFS
+PATH SIZE: 54
+52 109 106 56
+21 ms
+
+java FifteenProblem "12345678 ABC9DEF" AStar h1
+PATH LENGTH: 5
+4 19 6 8
+
+9 ms
+
+java FifteenProblem "12345678 ABC9DEF" AStar h2
+PATH LENGTH: 5
+4 19 6 8
+
+7 ms
+
+java FifteenProblem "12345678 ABC9DEF" GBFS h1
+PATH LENGTH: 5
+4 12 4 5
+
+4 ms
+
+java FifteenProblem "12345678 ABC9DEF" GBFS h2
+PATH LENGTH: 5
+4 12 4 5
+
+5 ms
+
+[2,3,4,8]
+[1,6,7,C]
+[5,A,B,F]
+[ ,9,D,E]
+java FifteenProblem "2348167C5ABF 9DE" gbfs h2

@@ -118,13 +118,16 @@ public class Board {
 
         fringe.push(current);
         int fringeSize = fringe.size();
-        fringe.pop();
+//        fringe.pop();
         int createdNodes = 1;
-        int expanded = 1;
-        int row = current.getRow(BLANK);
-        int column = current.getColumn(BLANK);
+        int expanded = 0;
+        int row;
+        int column;
         boolean win = false;
-        while(!win){
+        while(!win && !fringe.isEmpty()){
+            current = fringe.pop();
+            row = current.getRow(BLANK);
+            column = current.getColumn(BLANK);
             if(current.winState()){
                 win = true;
             }else{
@@ -153,16 +156,10 @@ public class Board {
             if(fringe.size() > fringeSize){
                 fringeSize = fringe.size();
             }
-
-            if(!fringe.isEmpty()){
-                current = fringe.pop();
-                row = current.getRow(BLANK);
-                column = current.getColumn(BLANK);
-            }
         }
 
-
-        return tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
+        ArrayList<PuzzleNode> path = current.findPathFromGoal();
+        return "PATH SIZE: "+ path.size()+ "\n"+ tree.getDepth() + " "+ createdNodes + " " + expanded + " "+ fringeSize;
     }
 
     /**
