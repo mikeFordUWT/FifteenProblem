@@ -1,0 +1,11 @@
+TO TEST
+
+java FifteenProblem "234 16785ABC9DEF" DLS 9
+java FifteenProblem "234 16785ABC9DEF" BFS
+java FifteenProblem "234 16785ABC9DEF" AStar h2
+java FifteenProblem "234 16785ABC9DEF" AStar h1
+java FifteenProblem "234 16785ABC9DEF" GBFS h1
+java FifteenProblem "234 16785ABC9DEF" GBFS h2
+
+ASTAR h2
+9 92 28 37
