@@ -138,7 +138,7 @@ public class Board {
             expanded++;
             visited.add(current);
 
-            ArrayList<PuzzleNode> moves = movesNoH(current, row, column);
+            ArrayList<PuzzleNode> moves = movesDFS(current, row, column);
             for(int i = 0; i < moves.size(); i++){
                 if(!created.contains(moves.get(i))){
                     created.add(moves.get(i));
@@ -204,7 +204,7 @@ public class Board {
             }
 
             visited.add(current);
-            ArrayList<PuzzleNode> moves = movesWithH(current, row, column);
+            ArrayList<PuzzleNode> moves = movesDFS(current, row, column);
 
             createdNodes += moves.size();
             for(int i = 0; i< moves.size(); i++){
@@ -529,6 +529,42 @@ public class Board {
             }
         }
         return newCopy;
+    }
+
+    /*
+        A helper method for DFS.
+     */
+    private ArrayList<PuzzleNode> movesDFS(PuzzleNode current, int i, int j){
+        ArrayList<PuzzleNode> neighbors = new ArrayList<>();
+        //Handle top edge case
+        if(i != 0){//visit up first
+            char[][] data = makeCopy(current.getData());
+            PuzzleNode up = new PuzzleNode(moveUp(data), current.getDepth() + 1, current);
+            neighbors.add(up);
+        }
+
+        //Handle left edge case
+        if(j != 0){
+            char[][] data = makeCopy(current.getData());
+            PuzzleNode left = new PuzzleNode(moveLeft(data), current.getDepth()+ 1, current);
+            neighbors.add(left);
+        }
+
+        //Handle bottom edge case
+        if(i != myBoard.length - 1){
+            char[][] data = makeCopy(current.getData());
+            PuzzleNode down = new PuzzleNode(moveDown(data), current.getDepth() + 1, current);
+            neighbors.add(down);
+        }
+
+        //Handle right edge case
+        if(j != myBoard.length - 1){
+            char[][] data = makeCopy(current.getData());
+            PuzzleNode right = new PuzzleNode(moveRight(data), current.getDepth() + 1, current);
+            neighbors.add(right);
+        }
+
+        return neighbors;
     }
 
     /*
